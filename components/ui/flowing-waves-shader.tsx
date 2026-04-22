@@ -16,9 +16,11 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
 
     // 1) Renderer + Scene + Camera + Clock
     let renderer: THREE.WebGLRenderer;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: false });
+      renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
     } catch (err) {
       console.error('WebGL not supported', err);
@@ -46,6 +48,7 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
       uniform vec2 iMouse;
       uniform int colorMode; // 0: neutral, 1: red, 2: blue, 3: green
       uniform bool disableCenterDimming;
+      uniform bool isMobile;
       varying vec2 vTextureCoord;
 
       void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -57,8 +60,10 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
         float radius = min(iResolution.x, iResolution.y) * 0.5;
         float centerDim = disableCenterDimming ? 1.0 : smoothstep(radius * 0.3, radius * 0.5, dist);
 
-        // Wave logic
+        // Wave logic - Reduced iterations on mobile
+        float iterations = isMobile ? 5.0 : 10.0;
         for(float i = 1.0; i < 10.0; i++){
+          if (isMobile && i >= 6.0) break;
           uv.x += 0.6 / i * cos(i * 2.5 * uv.y + iTime * 0.5);
           uv.y += 0.6 / i * cos(i * 1.5 * uv.x + iTime * 0.5);
         }
@@ -101,7 +106,8 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
       iResolution: { value: new THREE.Vector2() },
       iMouse: { value: new THREE.Vector2() },
       colorMode: { value: modeMap[colorMode] },
-      disableCenterDimming: { value: disableDimming }
+      disableCenterDimming: { value: disableDimming },
+      isMobile: { value: isMobile }
     };
 
     const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });

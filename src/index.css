@@ -240,3 +240,12 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes waves {
+  0% {
+    transform: translateY(-170px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

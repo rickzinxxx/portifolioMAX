@@ -38,6 +38,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import AnimatedGradientBackground from "@/components/ui/animated-gradient-background";
 import TunnelShowcase from "@/components/ui/tunnel-hero";
 import WebGLHero from "@/components/ui/revolution-hero";
+import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "@/components/ui/animated-pricing-cards";
 import { Sparkles } from "@/components/ui/sparkles";
 import InteractiveWaveShader from "@/components/ui/flowing-waves-shader";
 const Raycast = () => (
@@ -208,10 +209,12 @@ export default function App() {
 
             <motion.main 
               key="content"
-              className="relative z-10 w-full max-w-4xl mx-auto px-6 py-32 flex flex-col items-center gap-32"
+              className="relative z-10 w-full flex flex-col items-center pb-0"
             >
-              {/* Part 2: Connect & Business */}
-              <section className="w-full max-w-2xl">
+              {/* Main Content Sections */}
+              <div className="w-full max-w-4xl mx-auto px-6 pt-32 flex flex-col items-center gap-32">
+                {/* Part 2: Connect & Business */}
+                <section className="w-full max-w-2xl">
                 {/* Header / Brand */}
                 <div className="w-full flex justify-between items-center mb-16">
                    <div className="text-sm font-black italic tracking-tighter uppercase">MARCOS<span className="text-primary italic"> Henrique</span></div>
@@ -222,7 +225,7 @@ export default function App() {
                     <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-6 leading-[0.9] cinema-text-shadow">
                        Engenharia de <span className="text-primary">Software</span>
                     </h2>
-                    <p className="text-white/50 text-sm md:text-lg max-w-sm mx-auto font-medium leading-relaxed mb-10">
+                    <p className="text-white/80 text-sm md:text-lg max-w-sm mx-auto font-medium leading-relaxed mb-10">
                        Elevando marcas através de tecnologias 3D e interfaces de alto impacto com a Techify.
                     </p>
 
@@ -233,7 +236,7 @@ export default function App() {
                        <Rocket size={24} fill="currentColor" />
                        🚀 Iniciar um Projeto
                     </Button>
-                    <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
+                    <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/50">
                        Consultoria Técnica & Desenvolvimento Premium
                     </div>
                 </div>
@@ -265,9 +268,9 @@ export default function App() {
                           )}>
                             <link.icon size={20} />
                           </div>
-                          <span className="text-sm font-black uppercase tracking-widest">{link.title}</span>
+                          <span className="text-sm font-black uppercase tracking-widest text-white/90 group-hover:text-white transition-colors">{link.title}</span>
                        </div>
-                       <ArrowUpRight size={18} className="opacity-20 group-hover:opacity-100 transition-opacity" />
+                       <ArrowUpRight size={18} className="text-white/60 group-hover:text-white group-hover:opacity-100 transition-all opacity-100" />
                     </motion.button>
                   ))}
                 </div>
@@ -280,29 +283,28 @@ export default function App() {
                     <div className="h-[1px] flex-1 bg-white/5 mx-8" />
                     <ChevronRight className="text-primary" />
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {PROJECTS.map((project, idx) => (
-                      <motion.div
-                         key={idx}
-                         onClick={() => window.open(project.link, "_blank")}
-                         whileHover={{ y: -10 }}
-                         className="group relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.02] cursor-pointer"
+                      <PricingWrapper 
+                        key={idx} 
+                        contactHref={project.link} 
+                        type={idx % 2 === 0 ? 'waves' : 'crosses'}
+                        color={idx === 0 ? 'bg-primary' : 'bg-white/[0.03]'}
+                        className="max-w-none"
                       >
-                         <div className="aspect-[16/10] overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
-                            <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                         </div>
-                         <div className="p-8">
-                            <div className="text-[10px] font-black uppercase tracking-widest text-primary mb-3">{project.stack}</div>
-                            <h4 className="text-xl font-black italic uppercase tracking-tighter mb-3">{project.title}</h4>
-                            <p className="text-xs md:text-sm text-white/30 font-medium mb-6 leading-relaxed">{project.desc}</p>
-                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-primary/40 group-hover:text-primary transition-all">
-                               Explorar Lab <ArrowUpRight size={14} />
-                            </div>
-                         </div>
-                      </motion.div>
+                         <CardHeading className={idx === 0 ? 'text-black' : 'text-white'}>
+                           {project.title}
+                         </CardHeading>
+                         <CardPrice className={idx === 0 ? 'text-black/60' : 'text-primary'}>
+                           {project.stack}
+                         </CardPrice>
+                         <CardParagraph className={idx === 0 ? 'text-black/80' : 'text-white/70'}>
+                           {project.desc}
+                         </CardParagraph>
+                      </PricingWrapper>
                     ))}
                 </div>
+               </section>
 
                 <div className="mt-20 border-y border-white/5 py-12 overflow-hidden relative">
                    <motion.div 
@@ -313,51 +315,15 @@ export default function App() {
                       {[...STACK, ...STACK].map((skill, i) => (
                         <div key={i} className="flex items-center gap-6">
                            <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_rgba(255,40,0,0.5)]" />
-                           <span className="text-3xl font-black italic uppercase tracking-tighter text-white/20 hover:text-white transition-colors cursor-default">
+                           <span className="text-3xl font-black italic uppercase tracking-tighter text-white/40 hover:text-white transition-colors cursor-default">
                               {skill}
                            </span>
                         </div>
                       ))}
                    </motion.div>
                 </div>
-              </section>
 
-              {/* Part 4: Footer with Sparkles Effect */}
-              <section className="w-full relative mt-32">
-                <div className="relative h-96 w-full overflow-hidden rounded-[3rem] bg-zinc-900/40 border border-white/5 flex flex-col items-center justify-center">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_center,var(--primary),transparent_70%)] opacity-20" />
-                  <div className="absolute -left-1/2 top-1/2 aspect-[1/0.7] z-10 w-[200%] rounded-[100%] border-t border-white/10 bg-black/40 backdrop-blur-3xl" />
-                  <Sparkles
-                    density={1200}
-                    className="absolute inset-x-0 bottom-0 h-full w-full [mask-image:radial-gradient(50%_50%,white,transparent_85%)]"
-                    color="#ffffff"
-                  />
-                  
-                  <footer className="relative z-20 text-center flex flex-col items-center w-full px-4">
-                    <div className="mb-12">
-                      <p className="text-xl md:text-3xl font-bold tracking-tight text-white/90">
-                        Trusted by experts.<br />
-                        <span className="opacity-50">Used by the leaders.</span>
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-5 gap-4 md:gap-8 w-full max-w-lg mb-16 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
-                      <Retool />
-                      <Vercel />
-                      <Remote />
-                      <Arc />
-                      <Raycast />
-                    </div>
-
-                    <div className="text-[10px] font-black text-white/20 tracking-[0.5em] uppercase mb-1">
-                      Creative Software Engineering
-                    </div>
-                    <div className="text-[8px] font-black text-primary/40 uppercase tracking-widest italic">
-                       Powered by Marcos Henrique
-                    </div>
-                  </footer>
-                </div>
-              </section>
+              </div>
 
             </motion.main>
           </motion.div>

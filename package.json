@@ -17,6 +17,7 @@
     "@lottiefiles/dotlottie-react": "^0.19.0",
     "@paper-design/shaders-react": "^0.0.76",
     "@radix-ui/react-slot": "^1.2.4",
+    "@studio-freight/lenis": "^1.0.42",
     "@tailwindcss/vite": "^4.1.14",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",

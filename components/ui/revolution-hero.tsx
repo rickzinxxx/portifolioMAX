@@ -166,10 +166,11 @@ interface NavLinkProps {
 
 function NavLink({ children, onClick, gradient }: NavLinkProps) {
   const linkRef = useRef<HTMLButtonElement>(null)
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   useEffect(() => {
     const link = linkRef.current
-    if (!link) return
+    if (!link || isMobile) return
 
     const handleMouseEnter = () => {
       gsap.to(link, {
@@ -252,6 +253,8 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
     const gl = canvas.getContext("webgl")
     if (!gl) return
     glRef.current = gl
+    
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexShader)
     const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShader)
@@ -277,8 +280,9 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
 
     const handleResize = () => {
       const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width * window.devicePixelRatio
-      canvas.height = rect.height * window.devicePixelRatio
+      const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio, 2)
+      canvas.width = rect.width * dpr
+      canvas.height = rect.height * dpr
       gl.viewport(0, 0, canvas.width, canvas.height)
     }
 
@@ -386,7 +390,7 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
                     { icon: Rocket, title: "Criação de Loja", desc: "E-commerces focados em conversão e usabilidade." },
                     { icon: Cpu, title: "Automação com IA", desc: "Sistemas inteligentes para otimizar fluxos de trabalho." },
                     { icon: Smartphone, title: "Social Media", desc: "Gestão estratégica de presença digital." },
-                    { icon: Monitor, title: "Editor", desc: "Edição de vídeo e motion design para web." }
+                    { icon: Monitor, title: "Editor", desc: "Edição de vídeo e interfaces dinâmicas para web." }
                   ].map((s, i) => (
                     <div key={i} className="bg-white/5 p-4 rounded-2xl border border-white/5 flex gap-4 items-start">
                       <div className="p-2 bg-primary/10 rounded-lg text-primary"><s.icon size={20} /></div>

@@ -9,7 +9,7 @@ const resources = {
         experience: "Experiência",
         slides: [
           {
-            title: "Seja bem vindo ao portifolio de rickzinxx_",
+            title: "Seja bem vindo ao portfólio de Marcos Henrique",
             subtitle: "Onde a estética encontra o impossível.",
             button: "Prosseguir"
           },
@@ -36,7 +36,7 @@ const resources = {
         badge: "Desenvolvedor Criativo — 2026",
         title1: "Alquimista",
         title2: "Digital",
-        subtitle: "Transcende as fronteiras comuns do web design através de código de alta performance e estética cinematográfica.",
+        subtitle: "Transcende as fronteiras da web moderna através de engenharia de software de alta performance e estética cinematográfica.",
         ctaStart: "INICIAR PROJETO",
         ctaWorks: "VER MEUS TRABALHOS",
         scrollDown: "Role para baixo"
@@ -65,7 +65,7 @@ const resources = {
           role: "Papel",
           explore: "Explorar",
           caseStudy: "Estudo de Caso",
-          description: "Design conceitual e implementação arquitetônica de ambientes web de alta conversão."
+          description: "Desenvolvimento técnico e implementação arquitetônica de ambientes web de alta conversão."
         }
       },
       contact: {
@@ -85,7 +85,7 @@ const resources = {
         experience: "Experience",
         slides: [
           {
-            title: "Welcome to rickzinxx_ portfolio",
+            title: "Welcome to Marcos Henrique's portfolio",
             subtitle: "Where aesthetics meets the impossible.",
             button: "Proceed"
           },
@@ -112,7 +112,7 @@ const resources = {
         badge: "Creative Developer — 2026",
         title1: "Digital",
         title2: "Alchemist",
-        subtitle: "Transcending the ordinary boundaries of web design through high-performance code and cinematic aesthetics.",
+        subtitle: "Transcending the boundaries of the modern web through high-performance software engineering and cinematic aesthetics.",
         ctaStart: "START THE PROJECT",
         ctaWorks: "SEE MY WORKS",
         scrollDown: "scroll down"
@@ -141,7 +141,7 @@ const resources = {
           role: "Role",
           explore: "Explore",
           caseStudy: "Case Study",
-          description: "Conceptual design and architectural implementation of high-converting web environments."
+          description: "Technical development and architectural implementation of high-converting web environments."
         }
       },
       contact: {
