@@ -7,6 +7,13 @@ const resources = {
     translation: {
       intro: {
         experience: "Experiência",
+        cinematicPhrases: [
+          "Seja bem vindo ao portifolio do rickzinxx",
+          "E da nossa empresa Techify",
+          "Fizemos o designer a mao",
+          "Temos 5 anos de mercado",
+          "Seja bem vindo ao melhor melhor site que voce ja viu"
+        ],
         slides: [
           {
             title: "Seja bem vindo ao portfólio de Marcos Henrique",
@@ -83,6 +90,13 @@ const resources = {
     translation: {
       intro: {
         experience: "Experience",
+        cinematicPhrases: [
+          "Welcome to rickzinxx's portfolio",
+          "And to our company, Techify",
+          "We crafted the design by hand",
+          "We've been in the market for 5 years",
+          "Welcome to the best best site you've ever seen"
+        ],
         slides: [
           {
             title: "Welcome to Marcos Henrique's portfolio",

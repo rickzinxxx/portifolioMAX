@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Lenis from "lenis";
 import { useTranslation } from "react-i18next";
@@ -38,9 +38,51 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import AnimatedGradientBackground from "@/components/ui/animated-gradient-background";
 import TunnelShowcase from "@/components/ui/tunnel-hero";
 import WebGLHero from "@/components/ui/revolution-hero";
+import ShaderAnimation from "@/components/ui/shader-animation";
+import { SpotifyCard } from "@/components/ui/spotify-card";
 import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "@/components/ui/animated-pricing-cards";
 import { Sparkles } from "@/components/ui/sparkles";
 import InteractiveWaveShader from "@/components/ui/flowing-waves-shader";
+
+// Hidden music player logic
+const MusicPlayer = ({ isPlaying, volume, videoId }: { isPlaying: boolean, volume: number, videoId: string }) => {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const sendMessage = (func: string, args: any[] = []) => {
+    if (!iframeRef.current || !isLoaded) return;
+    iframeRef.current.contentWindow?.postMessage(JSON.stringify({
+      event: 'command',
+      func: func,
+      args: args
+    }), '*');
+  };
+
+  useEffect(() => {
+    if (isLoaded) {
+      sendMessage(isPlaying ? 'playVideo' : 'pauseVideo');
+    }
+  }, [isPlaying, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      sendMessage('setVolume', [volume]);
+    }
+  }, [volume, isLoaded]);
+
+  return (
+    <div className="fixed -top-full -left-full w-0 h-0 opacity-0 pointer-events-none overflow-hidden">
+      <iframe
+        ref={iframeRef}
+        onLoad={() => setIsLoaded(true)}
+        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&showinfo=0&rel=0`}
+        allow="autoplay"
+        title="background-music"
+      />
+    </div>
+  );
+};
+
 const Raycast = () => (
   <svg viewBox="0 0 180 56" fill="currentColor" className="w-full">
     <path
@@ -105,6 +147,15 @@ const BIO_LINKS = [
   { title: "LinkedIn Pro", icon: Linkedin, link: "#", color: "bg-white/5" },
 ];
 
+const THEME_SONG = [
+  {
+    title: "Malvadão 3",
+    artists: "Xamã",
+    duration: 180,
+    albumArt: "https://i.scdn.co/image/ab67616d0000b273b7a70197793a4604e3895726"
+  }
+];
+
 const ANIM_VARIANTS = {
   hidden: { opacity: 0, y: 30 },
   visible: { 
@@ -151,12 +202,19 @@ const LanguageSwitcher = () => {
   );
 };
 
+// Main Application Component
 export default function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [hasEntered, setHasEntered] = useState(false);
+  const [isCinematic, setIsCinematic] = useState(false);
   const [isDeveloping, setIsDeveloping] = useState(false);
   const [devTitle, setDevTitle] = useState("");
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(75);
   
+  const cinematicPhrasesRaw = t("intro.cinematicPhrases", { returnObjects: true });
+  const cinematicPhrases = Array.isArray(cinematicPhrasesRaw) ? cinematicPhrasesRaw : [];
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -180,7 +238,7 @@ export default function App() {
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
       
       <AnimatePresence mode="wait">
-        {!hasEntered ? (
+        {!hasEntered && !isCinematic && (
           <motion.div 
             key="intro-overlay"
             initial={{ opacity: 1 }}
@@ -192,9 +250,30 @@ export default function App() {
             }}
             className="fixed inset-0 z-[200]"
           >
-            <WebGLHero onEnter={() => setHasEntered(true)} />
+            <WebGLHero onEnter={() => setIsCinematic(true)} />
           </motion.div>
-        ) : (
+        )}
+
+        {isCinematic && (
+          <motion.div
+            key="cinematic-intro"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 1.5 } }}
+            className="fixed inset-0 z-[600]"
+          >
+            <ShaderAnimation 
+              phrases={cinematicPhrases} 
+              onComplete={() => {
+                setIsCinematic(false);
+                setHasEntered(true);
+                setIsMusicPlaying(true);
+              }} 
+            />
+          </motion.div>
+        )}
+
+        {hasEntered && (
           <motion.div 
             key="site-content"
             initial={{ opacity: 0 }}
@@ -202,6 +281,27 @@ export default function App() {
             transition={{ duration: 1.2, delay: 0.3 }}
             className="relative w-full"
           >
+            {/* Music Logic and UI */}
+            <MusicPlayer 
+              videoId="qzyl0f3mRG0" 
+              isPlaying={isMusicPlaying} 
+              volume={musicVolume} 
+            />
+
+            <div className="fixed bottom-6 right-6 z-[100] pointer-events-none">
+               <motion.div
+                 initial={{ opacity: 0, x: 50, filter: "blur(10px)" }}
+                 animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                 transition={{ duration: 1, delay: 1 }}
+               >
+                 <SpotifyCard 
+                   songs={THEME_SONG} 
+                   onPlayStateChange={setIsMusicPlaying}
+                   onVolumeChange={setMusicVolume}
+                 />
+               </motion.div>
+            </div>
+
             {/* Interactive Background Shader for the main site */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                <InteractiveWaveShader colorMode="red" disableDimming={true} />
