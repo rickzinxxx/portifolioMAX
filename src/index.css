@@ -105,6 +105,15 @@
   html {
     @apply font-sans;
     }
+  :root {
+    --gradient-color: #ff2800;
+    --sparkles-color: #ff2800;
+  }
+
+  .dark {
+    --gradient-color: #ff2800;
+    --sparkles-color: #ffffff;
+  }
 }
 
 @keyframes fadeInUp {
