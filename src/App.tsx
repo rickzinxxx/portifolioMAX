@@ -181,8 +181,11 @@ const LanguageSwitcher = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "rounded-full hover:bg-white/5")}>
-        <Languages className="w-4 h-4" />
+      <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "rounded-full hover:bg-white/5 flex items-center gap-2 group px-4")}>
+        <Languages className="w-4 h-4 text-white/50 group-hover:text-primary transition-colors" />
+        <span className="text-[10px] font-black uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">
+          {i18n.language.split('-')[0]}
+        </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-black/90 border-white/10 backdrop-blur-xl">
         <DropdownMenuItem 
@@ -317,16 +320,29 @@ export default function App() {
                 <section className="w-full max-w-2xl">
                 {/* Header / Brand */}
                 <div className="w-full flex justify-between items-center mb-16">
-                   <div className="text-sm font-black italic tracking-tighter uppercase">MARCOS<span className="text-primary italic"> Henrique</span></div>
+                   <motion.div 
+                     initial={{ opacity: 0, x: -20 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     whileHover={{ scale: 1.05, filter: "brightness(1.2)" }}
+                     className="text-2xl md:text-3xl font-black italic tracking-tighter uppercase cursor-default group"
+                   >
+                     <span className="text-white group-hover:text-primary transition-colors duration-500">{t("nav.brand")}</span>
+                     <span className="text-primary italic group-hover:text-white transition-colors duration-500">{t("nav.brandSuffix")}</span>
+                     <motion.div 
+                       animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.02, 1] }}
+                       transition={{ duration: 2, repeat: Infinity }}
+                       className="h-1 w-full bg-primary blur-[2px] mt-[-4px]" 
+                     />
+                   </motion.div>
                    <LanguageSwitcher />
                 </div>
 
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-6 leading-[0.9] cinema-text-shadow">
-                       Engenharia de <span className="text-primary">Software</span>
+                       {t("hero.title")}<span className="text-primary">{t("hero.titleSuffix")}</span>
                     </h2>
                     <p className="text-white/80 text-sm md:text-lg max-w-sm mx-auto font-medium leading-relaxed mb-10">
-                       Elevando marcas através de tecnologias 3D e interfaces de alto impacto com a Techify.
+                       {t("hero.subtitle")}
                     </p>
 
                     <Button
@@ -334,10 +350,10 @@ export default function App() {
                        className="w-full bg-primary text-black font-black text-xl italic uppercase py-8 rounded-[2rem] shadow-[0_20px_50px_rgba(255,40,0,0.3)] transition-all duration-500 hover:shadow-[0_25px_60px_rgba(255,40,0,0.4)] hover:scale-[1.02] active:scale-[0.98] mb-4 flex items-center justify-center gap-3"
                     >
                        <Rocket size={24} fill="currentColor" />
-                       🚀 Iniciar um Projeto
+                       {t("hero.cta")}
                     </Button>
                     <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/50">
-                       Consultoria Técnica & Desenvolvimento Premium
+                       {t("hero.subtext")}
                     </div>
                 </div>
 
@@ -379,7 +395,7 @@ export default function App() {
               {/* Part 3: Portfolio & Skills */}
               <section className="w-full">
                 <div className="flex items-center justify-between mb-12 px-2">
-                    <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Projetos Techify</h3>
+                    <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">{t("projects.title")}</h3>
                     <div className="h-[1px] flex-1 bg-white/5 mx-8" />
                     <ChevronRight className="text-primary" />
                 </div>
@@ -456,13 +472,13 @@ export default function App() {
                     autoplay
                   />
                 </div>
-                <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-2">{devTitle}</h3>
-                <p className="text-sm font-bold text-white/40 uppercase tracking-widest mb-8">
-                  EM DESENVOLVIMENTO
+                <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-2">{t("dev.title")}</h3>
+                <p className="text-sm font-bold text-white/40 uppercase tracking-widest mb-8 text-center">
+                  {t("dev.description")}
                 </p>
                 <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary leading-relaxed">
-                    Estamos moldando esta experiência para ser absoluta. Volte em breve para ver o resultado.
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary leading-relaxed text-center leading-relaxed">
+                    {t("dev.description")}
                   </p>
                 </div>
                 <Button 
@@ -470,7 +486,7 @@ export default function App() {
                   variant="ghost" 
                   className="mt-8 rounded-full font-black text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-white"
                 >
-                  Fechar [ESC]
+                  {t("dev.close")}
                 </Button>
               </div>
             </motion.div>

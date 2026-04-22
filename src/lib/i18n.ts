@@ -8,81 +8,32 @@ const resources = {
       intro: {
         experience: "Experiência",
         cinematicPhrases: [
-          "Seja bem vindo ao portifolio do rickzinxx",
+          "Seja bem vindo ao portfólio do rickzinxx",
           "E da nossa empresa Techify",
-          "Fizemos o designer a mao",
+          "Fizemos o design à mão",
           "Temos 5 anos de mercado",
-          "Seja bem vindo ao melhor melhor site que voce ja viu"
-        ],
-        slides: [
-          {
-            title: "Seja bem vindo ao portfólio de Marcos Henrique",
-            subtitle: "Onde a estética encontra o impossível.",
-            button: "Prosseguir"
-          },
-          {
-            title: "Uma Nova Dimensão",
-            subtitle: "Interfaces construídas com precisão cinematográfica.",
-            button: "Descobrir"
-          },
-          {
-            title: "Pronto para a Experiência?",
-            subtitle: "Aperte o cinto para entrar no meu universo.",
-            button: "ESTOU PRONTO"
-          }
+          "O melhor site que você já viu"
         ]
       },
       nav: {
-        about: "Sobre",
-        stack: "Stack",
-        projects: "Projetos",
-        contact: "Contato",
-        sayHello: "DIGA OLÁ"
+        brand: "MARCOS",
+        brandSuffix: " Henrique",
+        language: "Idioma"
       },
       hero: {
-        badge: "Desenvolvedor Criativo — 2026",
-        title1: "Alquimista",
-        title2: "Digital",
-        subtitle: "Transcende as fronteiras da web moderna através de engenharia de software de alta performance e estética cinematográfica.",
-        ctaStart: "INICIAR PROJETO",
-        ctaWorks: "VER MEUS TRABALHOS",
-        scrollDown: "Role para baixo"
+        title: "Engenharia de",
+        titleSuffix: " Software",
+        subtitle: "Elevando marcas através de tecnologias 3D e interfaces de alto impacto com a Techify.",
+        cta: "🚀 Iniciar um Projeto",
+        subtext: "Consultoria Técnica & Desenvolvimento Premium"
       },
-      about: {
-        origins: "01 — Origens",
-        title1: "Além dos",
-        title2: "Pixels.",
-        description: "Eu não apenas construo sites; eu moldo legados digitais. Cada projeto é um experimento para empurrar os limites do que é possível no navegador.",
-        stats: {
-          realized: "Realizados",
-          impact: "Impacto",
-          vision: "Visão",
-          aura: "Aura",
-          impactVal: "Alto",
-          visionVal: "4K",
-          auraVal: "Neon"
-        }
+      dev: {
+        title: "EM DESENVOLVIMENTO",
+        description: "Estamos moldando esta experiência para ser absoluta. Volte em breve para ver o resultado.",
+        close: "Fechar [ESC]"
       },
       projects: {
-        label: "02 — Trabalhos Selecionados",
-        title1: "Odisseia",
-        title2: "Visual.",
-        description: "Uma coleção de experiências de alta fidelidade projetadas para dominar o cenário digital.",
-        card: {
-          role: "Papel",
-          explore: "Explorar",
-          caseStudy: "Estudo de Caso",
-          description: "Desenvolvimento técnico e implementação arquitetônica de ambientes web de alta conversão."
-        }
-      },
-      contact: {
-        title: "Acenda sua\nVisão.",
-        cta: "INICIAR COLAB",
-        footer: {
-          built: "CONSTRUÍDO PARA EXCELÊNCIA",
-          privacy: "Política de Privacidade",
-          cookies: "Cookies"
-        }
+        title: "Projetos Techify"
       }
     }
   },
@@ -94,78 +45,29 @@ const resources = {
           "Welcome to rickzinxx's portfolio",
           "And to our company, Techify",
           "We crafted the design by hand",
-          "We've been in the market for 5 years",
-          "Welcome to the best best site you've ever seen"
-        ],
-        slides: [
-          {
-            title: "Welcome to Marcos Henrique's portfolio",
-            subtitle: "Where aesthetics meets the impossible.",
-            button: "Proceed"
-          },
-          {
-            title: "A New Dimension",
-            subtitle: "Interfaces built with cinematic precision.",
-            button: "Discover"
-          },
-          {
-            title: "Ready for the Experience?",
-            subtitle: "Fasten your seatbelt to enter my universe.",
-            button: "I'M READY"
-          }
+          "5 years of experience",
+          "The best site you've ever seen"
         ]
       },
       nav: {
-        about: "About",
-        stack: "Stack",
-        projects: "Projects",
-        contact: "Contact",
-        sayHello: "SAY HELLO"
+        brand: "MARCOS",
+        brandSuffix: " Henrique",
+        language: "Language"
       },
       hero: {
-        badge: "Creative Developer — 2026",
-        title1: "Digital",
-        title2: "Alchemist",
-        subtitle: "Transcending the boundaries of the modern web through high-performance software engineering and cinematic aesthetics.",
-        ctaStart: "START THE PROJECT",
-        ctaWorks: "SEE MY WORKS",
-        scrollDown: "scroll down"
+        title: "Software",
+        titleSuffix: " Engineering",
+        subtitle: "Elevating brands through 3D technologies and high-impact interfaces with Techify.",
+        cta: "🚀 Start a Project",
+        subtext: "Technical Consulting & Premium Development"
       },
-      about: {
-        origins: "01 — Origins",
-        title1: "Beyond",
-        title2: "Pixels.",
-        description: "I don't just build websites; I craft digital legacies. Each project is an experiment in pushing the limits of what's possible in the browser.",
-        stats: {
-          realized: "Realized",
-          impact: "Impact",
-          vision: "Vision",
-          aura: "Aura",
-          impactVal: "High",
-          visionVal: "4K",
-          auraVal: "Neon"
-        }
+      dev: {
+        title: "UNDER DEVELOPMENT",
+        description: "We are shaping this experience to be absolute. Come back soon to see the result.",
+        close: "Close [ESC]"
       },
       projects: {
-        label: "02 — Selected Works",
-        title1: "Visual",
-        title2: "Odyssey.",
-        description: "A collection of high-fidelity experiences designed to dominate the digital landscape.",
-        card: {
-          role: "Role",
-          explore: "Explore",
-          caseStudy: "Case Study",
-          description: "Technical development and architectural implementation of high-converting web environments."
-        }
-      },
-      contact: {
-        title: "Ignite Your\nVision.",
-        cta: "START COLLAB",
-        footer: {
-          built: "BUILT FOR EXCELLENCE",
-          privacy: "Privacy Policy",
-          cookies: "Cookies"
-        }
+        title: "Techify Projects"
       }
     }
   }

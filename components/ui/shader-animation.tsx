@@ -227,7 +227,7 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
     <div className="fixed inset-0 z-[500] bg-black overflow-hidden flex items-center justify-center">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-60" />
       
-      <div className="relative z-10 w-full max-w-4xl px-8 text-center">
+      <div className="relative z-10 w-full max-w-4xl px-8 text-center mt-[-5vh]">
         <AnimatePresence mode="wait">
           {phrases[currentPhraseIdx] && (
             <motion.div
@@ -238,10 +238,10 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
               transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col items-center justify-center gap-6"
             >
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-black italic uppercase tracking-tighter text-white cinema-text-shadow leading-[0.9]">
+              <h2 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-black italic uppercase tracking-tighter text-white cinema-text-shadow leading-[1.0] md:leading-[0.9] break-words max-w-[90vw]">
                 {phrases[currentPhraseIdx]}
               </h2>
-              <div className="w-16 h-[2px] bg-primary animate-pulse" />
+              <div className="w-12 md:w-16 h-[2px] bg-primary animate-pulse" />
             </motion.div>
           )}
         </AnimatePresence>
