@@ -75,7 +75,7 @@ const MusicPlayer = ({ isPlaying, volume, videoId }: { isPlaying: boolean, volum
       <iframe
         ref={iframeRef}
         onLoad={() => setIsLoaded(true)}
-        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&showinfo=0&rel=0`}
+        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&showinfo=0&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
         allow="autoplay"
         title="background-music"
       />
@@ -253,7 +253,10 @@ export default function App() {
             }}
             className="fixed inset-0 z-[200]"
           >
-            <WebGLHero onEnter={() => setIsCinematic(true)} />
+            <WebGLHero onEnter={() => {
+              setIsCinematic(true);
+              setIsMusicPlaying(true);
+            }} />
           </motion.div>
         )}
 
@@ -284,13 +287,6 @@ export default function App() {
             transition={{ duration: 1.2, delay: 0.3 }}
             className="relative w-full"
           >
-            {/* Music Logic and UI */}
-            <MusicPlayer 
-              videoId="qzyl0f3mRG0" 
-              isPlaying={isMusicPlaying} 
-              volume={musicVolume} 
-            />
-
             <div className="fixed bottom-6 right-6 z-[100] pointer-events-none">
                <motion.div
                  initial={{ opacity: 0, x: 50, filter: "blur(10px)" }}
@@ -382,7 +378,7 @@ export default function App() {
                             "p-3 rounded-2xl",
                             link.color.includes("bg-primary") ? "bg-black/10" : "bg-white/5 group-hover:bg-primary/20 transition-colors"
                           )}>
-                            <link.icon size={20} />
+                             <link.icon size={20} />
                           </div>
                           <span className="text-sm font-black uppercase tracking-widest text-white/90 group-hover:text-white transition-colors">{link.title}</span>
                        </div>
@@ -445,6 +441,15 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Music Logic (Moved outside to mount earlier) */}
+      {(isCinematic || hasEntered) && (
+        <MusicPlayer 
+          videoId="qzyl0f3mRG0" 
+          isPlaying={isMusicPlaying} 
+          volume={musicVolume} 
+        />
+      )}
 
       <AnimatePresence>
         {isDeveloping && (
