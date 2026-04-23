@@ -13,6 +13,11 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
   const animationRef = useRef<number | null>(null);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
   const [currentPhraseIdx, setCurrentPhraseIdx] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -39,6 +44,7 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
       uniform vec2 u_resolution;
       uniform float u_time;
       uniform vec2 u_mouse;
+      uniform bool u_isMobile;
       
       vec3 palette(float t) {
         vec3 a = vec3(0.5, 0.5, 0.5);
@@ -62,12 +68,17 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
         float d = length(uv);
         vec3 col = vec3(0.0);
         
+        // Mobile optimization: fewer layers
+        int maxLayers = u_isMobile ? 2 : 4;
+        
         // Create multiple animated layers
-        for(float i = 0.0; i < 4.0; i++) {
+        for(int i = 0; i < 4; i++) {
+          if (i >= maxLayers) break;
+          float fi = float(i);
           uv = fract(uv * 1.5) - 0.5;
           
           d = length(uv) * exp(-length(uv0));
-          vec3 color = palette(length(uv0) + i * 0.4 + u_time * 0.01);
+          vec3 color = palette(length(uv0) + fi * 0.4 + u_time * 0.01);
           
           d = sin(d * 4.0 + u_time) / 36.0;
           d = pow(0.005 / d, 1.5);
@@ -143,6 +154,7 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
     const timeLocation = gl.getUniformLocation(program, 'u_time');
     const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+    const isMobileLocation = gl.getUniformLocation(program, 'u_isMobile');
 
     // Handle resize
     const handleResize = () => {
@@ -180,6 +192,7 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform1f(timeLocation, currentTime);
       gl.uniform2f(mouseLocation, mouseRef.current.x, mouseRef.current.y);
+      gl.uniform1i(isMobileLocation, isMobile ? 1 : 0);
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 

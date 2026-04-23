@@ -20,6 +20,7 @@ const fragmentShader = `
   uniform vec2 u_resolution;
   uniform vec2 u_mouse;
   uniform float u_intensity;
+  uniform bool u_isMobile;
   
   vec3 hash3(vec2 p) {
     vec3 q = vec3(dot(p, vec2(127.1, 311.7)), 
@@ -43,8 +44,10 @@ const fragmentShader = `
     float amplitude = 1.0;
     float frequency = 0.25;
     
+    int actualOctaves = u_isMobile ? 4 : octaves;
+    
     for(int i = 0; i < 10; i++) {
-      if(i >= octaves) break;
+      if(i >= actualOctaves) break;
       value += amplitude * noise(p * frequency);
       amplitude *= 0.52;
       frequency *= 1.13;
@@ -57,14 +60,18 @@ const fragmentShader = `
     vec2 f = fract(p);
     float md = 50.0;
     
-    for(int i = -2; i <= 2; i++) {
-      for(int j = -2; j <= 2; j++) {
-        vec2 g = vec2(i, j);
-        vec2 o = hash3(n + g).xy;
-        o = 0.5 + 0.41 * sin(u_time * 1.5 + 6.28 * o);
-        vec2 r = g + o - f;
-        float d = dot(r, r);
-        md = min(md, d);
+    int range = u_isMobile ? 1 : 2;
+    
+    for(int i = -1; i <= 1; i++) {
+      for(int j = -1; j <= 1; j++) {
+        if (!u_isMobile || (abs(float(i)) <= float(range) && abs(float(j)) <= float(range))) {
+          vec2 g = vec2(float(i), float(j));
+          vec2 o = hash3(n + g).xy;
+          o = 0.5 + 0.41 * sin(u_time * 1.5 + 6.28 * o);
+          vec2 r = g + o - f;
+          float d = dot(r, r);
+          md = min(md, d);
+        }
       }
     }
     return sqrt(md);
@@ -99,15 +106,15 @@ const fragmentShader = `
     
     float time = u_time * 0.25; 
     
-    vec2 curlForce = curl(st * 2.0, time) * 0.6;
+    vec2 curlForce = curl(st * 1.5, time * 0.5) * (u_isMobile ? 0.3 : 0.6);
     vec2 flowField = st + curlForce;
     
-    float dist1 = fbm(flowField * 1.5 + time * 1.2, 8) * 0.4;
-    float dist2 = fbm(flowField * 2.3 - time * 0.8, 6) * 0.3;
-    float dist3 = fbm(flowField * 3.1 + time * 1.8, 4) * 0.2;
-    float dist4 = fbm(flowField * 4.7 - time * 1.1, 3) * 0.15;
+    float dist1 = fbm(flowField * 1.5 + time * 0.8, u_isMobile ? 3 : 8) * 0.4;
+    float dist2 = fbm(flowField * 2.3 - time * 0.6, u_isMobile ? 2 : 6) * 0.3;
+    float dist3 = u_isMobile ? 0.0 : fbm(flowField * 3.1 + time * 1.2, 4) * 0.2;
+    float dist4 = u_isMobile ? 0.0 : fbm(flowField * 4.7 - time * 0.9, 3) * 0.15;
     
-    float cells = voronoi(flowField * 2.5 + time * 0.5);
+    float cells = voronoi(flowField * (u_isMobile ? 1.5 : 2.5) + time * 0.4);
     cells = smoothstep(0.1, 0.7, cells);
     
     float plasmaEffect = plasma(flowField + vec2(dist1, dist2), time * 1.5) * 0.2;
@@ -229,9 +236,15 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
   const resolutionLocationRef = useRef<WebGLUniformLocation | null>(null)
   const mouseLocationRef = useRef<WebGLUniformLocation | null>(null)
   const intensityLocationRef = useRef<WebGLUniformLocation | null>(null)
+  const isMobileLocationRef = useRef<WebGLUniformLocation | null>(null)
   const startTimeRef = useRef<number>(Date.now())
   const [globalIntensity, setGlobalIntensity] = useState(1.0)
   const [isServicesOpen, setIsServicesOpen] = useState(false)
+  const [isMobileDevice, setIsMobileDevice] = useState(false)
+
+  useEffect(() => {
+    setIsMobileDevice(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+  }, [])
 
   const createShader = (gl: WebGLRenderingContext, type: number, source: string) => {
     const shader = gl.createShader(type)
@@ -277,6 +290,7 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
     resolutionLocationRef.current = gl.getUniformLocation(program, "u_resolution")
     mouseLocationRef.current = gl.getUniformLocation(program, "u_mouse")
     intensityLocationRef.current = gl.getUniformLocation(program, "u_intensity")
+    isMobileLocationRef.current = gl.getUniformLocation(program, "u_isMobile")
 
     const handleResize = () => {
       const rect = canvas.getBoundingClientRect()
@@ -330,6 +344,7 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
          gl.uniform2f(resolutionLocationRef.current, gl.canvas.width, gl.canvas.height)
          gl.uniform2f(mouseLocationRef.current, mouseRef.current.x, mouseRef.current.y)
          gl.uniform1f(intensityLocationRef.current, globalIntensity)
+         gl.uniform1i(isMobileLocationRef.current, isMobileDevice ? 1 : 0)
          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
       }
       animFrame = requestAnimationFrame(render)

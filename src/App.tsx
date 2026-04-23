@@ -37,10 +37,13 @@ import {
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import AnimatedGradientBackground from "@/components/ui/animated-gradient-background";
 import TunnelShowcase from "@/components/ui/tunnel-hero";
+import WebGLHero from "@/components/ui/revolution-hero";
+import ShaderAnimation from "@/components/ui/shader-animation";
 import { SpotifyCard } from "@/components/ui/spotify-card";
 import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "@/components/ui/animated-pricing-cards";
 import { Sparkles } from "@/components/ui/sparkles";
 import InteractiveWaveShader from "@/components/ui/flowing-waves-shader";
+import { Hero3D } from "@/components/ui/hero-3d";
 
 // Hidden music player logic
 const MusicPlayer = ({ isPlaying, volume, videoId }: { isPlaying: boolean, volume: number, videoId: string }) => {
@@ -58,7 +61,19 @@ const MusicPlayer = ({ isPlaying, volume, videoId }: { isPlaying: boolean, volum
 
   useEffect(() => {
     if (isLoaded) {
-      sendMessage(isPlaying ? 'playVideo' : 'pauseVideo');
+      // Force play state when it changes
+      const act = async () => {
+        try {
+          sendMessage(isPlaying ? 'playVideo' : 'pauseVideo');
+          if (isPlaying) {
+             // Second attempt after a bit
+             setTimeout(() => sendMessage('playVideo'), 800);
+          }
+        } catch (e) {
+          console.error("Music command failed", e);
+        }
+      };
+      act();
     }
   }, [isPlaying, isLoaded]);
 
@@ -141,6 +156,7 @@ const PROJECTS = [
 const BIO_LINKS = [
   { title: "WhatsApp Business", icon: ExternalLink, link: "https://wa.me/558199130885", color: "bg-primary text-black" },
   { title: "Instagram Oficial", icon: Instagram, link: "https://www.instagram.com/rickzinxx_/", color: "bg-white/5" },
+  { title: "GitHub Repositories", icon: Github, link: "https://github.com/rickzinxxx", color: "bg-white/5" },
   { title: "LinkedIn Pro", icon: Linkedin, link: "#", color: "bg-white/5" },
 ];
 
@@ -205,13 +221,23 @@ const LanguageSwitcher = () => {
 // Main Application Component
 export default function App() {
   const { t, i18n } = useTranslation();
-  const [hasEntered, setHasEntered] = useState(true);
+  const [hasEntered, setHasEntered] = useState(false);
   const [isCinematic, setIsCinematic] = useState(false);
   const [isDeveloping, setIsDeveloping] = useState(false);
   const [devTitle, setDevTitle] = useState("");
-  const [isMusicPlaying, setIsMusicPlaying] = useState(true);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [musicVolume, setMusicVolume] = useState(75);
+  const [isMobile, setIsMobile] = useState(false);
   
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const cinematicPhrasesRaw = t("intro.cinematicPhrases", { returnObjects: true });
   const cinematicPhrases = Array.isArray(cinematicPhrasesRaw) ? cinematicPhrasesRaw : [];
 
@@ -238,6 +264,51 @@ export default function App() {
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
       
       <AnimatePresence mode="wait">
+        {!hasEntered && !isCinematic && (
+          <motion.div 
+            key="intro-overlay"
+            initial={{ opacity: 1 }}
+            exit={{ 
+              opacity: 0, 
+              filter: "blur(40px)", 
+              scale: 1.1,
+              transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] } 
+            }}
+            className="fixed inset-0 z-[200]"
+          >
+            <WebGLHero onEnter={() => {
+              setIsCinematic(true);
+              setIsMusicPlaying(true);
+              // Force early play command to unlock audio context on mobile
+              // Interaction-based play is more likely to succeed
+              const unlockAudio = () => {
+                setIsMusicPlaying(false);
+                setTimeout(() => setIsMusicPlaying(true), 50);
+              };
+              unlockAudio();
+            }} />
+          </motion.div>
+        )}
+
+        {isCinematic && (
+          <motion.div
+            key="cinematic-intro"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 1.5 } }}
+            className="fixed inset-0 z-[600]"
+          >
+            <ShaderAnimation 
+              phrases={cinematicPhrases} 
+              onComplete={() => {
+                setIsCinematic(false);
+                setHasEntered(true);
+                setIsMusicPlaying(true);
+              }} 
+            />
+          </motion.div>
+        )}
+
         {hasEntered && (
           <motion.div 
             key="site-content"
@@ -262,7 +333,9 @@ export default function App() {
 
             {/* Interactive Background Shader for the main site */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-               <InteractiveWaveShader colorMode="red" disableDimming={true} />
+               {!isMobile && <Hero3D />}
+               {!isMobile && <InteractiveWaveShader colorMode="red" disableDimming={true} />}
+               {isMobile && <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900 to-black opacity-50" />}
             </div>
 
             <motion.main 
@@ -402,11 +475,13 @@ export default function App() {
       </AnimatePresence>
 
       {/* Music Logic */}
-      <MusicPlayer 
-        videoId="qzyl0f3mRG0" 
-        isPlaying={isMusicPlaying} 
-        volume={musicVolume} 
-      />
+      {(isCinematic || hasEntered) && (
+        <MusicPlayer 
+          videoId="qzyl0f3mRG0" 
+          isPlaying={isMusicPlaying} 
+          volume={musicVolume} 
+        />
+      )}
 
       <AnimatePresence>
         {isDeveloping && (
