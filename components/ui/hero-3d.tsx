@@ -150,7 +150,7 @@ export const Hero3D: React.FC = () => {
   return (
     <div 
       ref={containerRef} 
-      className="absolute inset-0 z-[-1] pointer-events-none opacity-40"
+      className="absolute inset-0 pointer-events-none opacity-80"
       style={{ filter: 'blur(20px)' }}
     />
   );

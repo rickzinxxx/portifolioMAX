@@ -245,11 +245,17 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
   const startTimeRef = useRef<number>(Date.now())
   const [globalIntensity, setGlobalIntensity] = useState(1.0)
   const [isServicesOpen, setIsServicesOpen] = useState(false)
-  const [isMobileDevice, setIsMobileDevice] = useState(false)
+  const [isMobileDevice, setIsMobileDevice] = useState(() => {
+    if (typeof navigator !== 'undefined') {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    return false;
+  })
 
   useEffect(() => {
-    setIsMobileDevice(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-  }, [])
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobileDevice(isMobile);
+  }, []);
 
   const createShader = (gl: WebGLRenderingContext, type: number, source: string) => {
     const shader = gl.createShader(type)
@@ -300,8 +306,7 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
     const handleResize = () => {
       const rect = canvas.getBoundingClientRect()
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-      const dpr = isMobile ? 0.75 : Math.min(window.devicePixelRatio, 2)
+      const dpr = isMobile ? 0.85 : Math.min(window.devicePixelRatio, 2)
       canvas.width = rect.width * dpr
       canvas.height = rect.height * dpr
       gl.viewport(0, 0, canvas.width, canvas.height)

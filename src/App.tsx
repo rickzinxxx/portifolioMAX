@@ -36,9 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import AnimatedGradientBackground from "@/components/ui/animated-gradient-background";
-import TunnelShowcase from "@/components/ui/tunnel-hero";
 import WebGLHero from "@/components/ui/revolution-hero";
-import ShaderAnimation from "@/components/ui/shader-animation";
 import { SpotifyCard } from "@/components/ui/spotify-card";
 import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "@/components/ui/animated-pricing-cards";
 import { Sparkles } from "@/components/ui/sparkles";
@@ -52,25 +50,26 @@ const MusicPlayer = ({ isPlaying, volume, videoId }: { isPlaying: boolean, volum
 
   const sendMessage = (func: string, args: any[] = []) => {
     if (!iframeRef.current || !isLoaded) return;
-    iframeRef.current.contentWindow?.postMessage(JSON.stringify({
-      event: 'command',
-      func: func,
-      args: args
-    }), '*');
+    try {
+      iframeRef.current.contentWindow?.postMessage(JSON.stringify({
+        event: 'command',
+        func: func,
+        args: args
+      }), '*');
+    } catch (e) {
+      console.error("Youtube postMessage failed", e);
+    }
   };
 
   useEffect(() => {
     if (isLoaded) {
-      // Force play state when it changes
-      const act = async () => {
-        try {
-          sendMessage(isPlaying ? 'playVideo' : 'pauseVideo');
-          if (isPlaying) {
-             // Second attempt after a bit
-             setTimeout(() => sendMessage('playVideo'), 800);
-          }
-        } catch (e) {
-          console.error("Music command failed", e);
+      const act = () => {
+        sendMessage(isPlaying ? 'playVideo' : 'pauseVideo');
+        if (isPlaying) {
+          // Robust retry for autoplay unlocks
+          setTimeout(() => sendMessage('playVideo'), 100);
+          setTimeout(() => sendMessage('playVideo'), 500);
+          setTimeout(() => sendMessage('playVideo'), 1000);
         }
       };
       act();
@@ -84,12 +83,12 @@ const MusicPlayer = ({ isPlaying, volume, videoId }: { isPlaying: boolean, volum
   }, [volume, isLoaded]);
 
   return (
-    <div className="fixed -top-full -left-full w-0 h-0 opacity-0 pointer-events-none overflow-hidden">
+    <div className="fixed -top-full -left-full w-0 h-0 opacity-0 pointer-events-none overflow-hidden" aria-hidden="true">
       <iframe
         ref={iframeRef}
         onLoad={() => setIsLoaded(true)}
-        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&showinfo=0&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
-        allow="autoplay"
+        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&showinfo=0&rel=0&version=3&loop=1&playlist=${videoId}`}
+        allow="autoplay; encrypted-media"
         title="background-music"
       />
     </div>
@@ -232,7 +231,7 @@ export default function App() {
   useEffect(() => {
     const checkMobile = () => {
       const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-      setIsMobile(mobileRegex.test(navigator.userAgent) || window.innerWidth < 1024);
+      setIsMobile(mobileRegex.test(navigator.userAgent) || window.innerWidth < 768);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -271,42 +270,16 @@ export default function App() {
             initial={{ opacity: 1 }}
             exit={{ 
               opacity: 0, 
-              filter: "blur(40px)", 
               scale: 1.1,
-              transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] } 
+              transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
             }}
             className="fixed inset-0 z-[200]"
           >
             <WebGLHero onEnter={() => {
               // Direct user interaction to trigger audio and start experience
               setIsMusicPlaying(true);
-              setIsCinematic(true);
-              
-              // Extra safety for mobile audio context
-              if (isMusicPlaying) {
-                setIsMusicPlaying(false);
-                setTimeout(() => setIsMusicPlaying(true), 100);
-              }
+              setHasEntered(true);
             }} />
-          </motion.div>
-        )}
-
-        {isCinematic && (
-          <motion.div
-            key="cinematic-intro"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1.5 } }}
-            className="fixed inset-0 z-[600]"
-          >
-            <ShaderAnimation 
-              phrases={cinematicPhrases} 
-              onComplete={() => {
-                setIsCinematic(false);
-                setHasEntered(true);
-                setIsMusicPlaying(true);
-              }} 
-            />
           </motion.div>
         )}
 
@@ -315,7 +288,7 @@ export default function App() {
             key="site-content"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, delay: 0.3 }}
+            transition={{ duration: 0.8 }}
             className="relative w-full"
           >
             <div className="fixed bottom-6 right-6 z-[100] pointer-events-none">
@@ -333,10 +306,11 @@ export default function App() {
             </div>
 
             {/* Interactive Background Shader for the main site */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-               {!isMobile && <Hero3D />}
-               {!isMobile && <InteractiveWaveShader colorMode="red" disableDimming={true} />}
-               {isMobile && <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900 to-black opacity-50" />}
+            <div className="fixed inset-0 z-0 bg-black pointer-events-none">
+               <Hero3D />
+               <div className="absolute inset-0 opacity-40">
+                  <InteractiveWaveShader colorMode="red" disableDimming={true} />
+               </div>
             </div>
 
             <motion.main 

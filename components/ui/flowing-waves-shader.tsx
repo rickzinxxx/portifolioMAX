@@ -19,8 +19,9 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: false });
+      renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true });
       renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
+      renderer.setClearColor(0x000000, 0);
       container.appendChild(renderer.domElement);
     } catch (err) {
       console.error('WebGL not supported', err);
@@ -81,11 +82,12 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
 
         // Plasma effect
         float intensity = 0.1 / abs(sin(iTime - uv.y - uv.x));
-        fragColor = vec4(baseColor * intensity, 1.0);
+        fragColor = vec4(baseColor * intensity, intensity * 0.3);
         
         // Add white glow/highlight to the plasma ripples for the "sombra branca" feel
         float highlights = smoothstep(0.8, 1.0, intensity * 0.5);
         fragColor.rgb += vec3(highlights * 0.3);
+        fragColor.a += highlights * 0.2;
         
         if (!disableCenterDimming) {
           fragColor.rgb = mix(fragColor.rgb * 0.3, fragColor.rgb, centerDim);
@@ -110,7 +112,13 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
       isMobile: { value: isMobile }
     };
 
-    const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms });
+    const material = new THREE.ShaderMaterial({ 
+      vertexShader, 
+      fragmentShader, 
+      uniforms,
+      transparent: true,
+      blending: THREE.AdditiveBlending 
+    });
     materialRef.current = material;
     const geometry = new THREE.PlaneGeometry(2, 2);
     const mesh = new THREE.Mesh(geometry, material);
@@ -155,7 +163,7 @@ const InteractiveWaveShader = ({ colorMode = 'red', disableDimming = true }: Int
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-0 bg-black pointer-events-none"
+      className="absolute inset-0 z-0 pointer-events-none"
       aria-label="Interactive wave animation"
     />
   );
