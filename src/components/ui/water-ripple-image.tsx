@@ -123,11 +123,10 @@ void main() {
   img_uv += (u_surface_distortion * surf);
 
   vec4 img = texture2D(u_image_texture, img_uv);
-  img *= (1. + u_illumination * surf);
-
+  // img *= (1. + u_illumination * surf);
   color += img.rgb;
-  // Deep blood red ripples instead of bright neon
-  color += u_illumination * vec3(0.7, 0.0, 0.0) * surf;
+  // Intense vibrant red ripples - removed whiteness
+  color += u_illumination * vec3(1.0, 0.0, 0.0) * surf;
   opacity += img.a;
 
   gl_FragColor = vec4(color, opacity);

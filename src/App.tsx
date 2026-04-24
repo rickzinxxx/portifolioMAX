@@ -44,6 +44,8 @@ import { Sparkles } from "./components/ui/sparkles";
 import InteractiveWaveShader from "./components/ui/flowing-waves-shader";
 import { Hero3D } from "./components/ui/hero-3d";
 import BackgroundShaders from "./components/ui/background-shaders";
+import { ShaderButton } from "./components/ui/shader-button";
+import { CTASection } from "./components/ui/hero-dithering-card";
 
 interface MusicPlayerHandle {
   sendMessage: (func: string, args?: any[]) => void;
@@ -277,16 +279,6 @@ export default function App() {
       {/* Background Effect - Always Visible */}
       <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden touch-none">
         <BackgroundShaders isMobile={isMobile} />
-        <div className="absolute inset-0 z-10 opacity-60">
-          <WaterRippleImage 
-            blueish={0.0}
-            scale={isMobile ? 5 : 8}
-            illumination={0.8}
-            surfaceDistortion={0.1}
-            waterDistortion={0.05}
-            src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=1920"
-          />
-        </div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -372,13 +364,13 @@ export default function App() {
                        {t("hero.subtitle")}
                     </p>
 
-                    <Button
+                    <ShaderButton
                        onClick={() => window.open("https://wa.me/558199130885", "_blank")}
-                       className="w-full bg-primary text-black font-black text-xl italic uppercase py-8 rounded-[2rem] shadow-[0_20px_50px_rgba(255,40,0,0.3)] transition-all duration-500 hover:shadow-[0_25px_60px_rgba(255,40,0,0.4)] hover:scale-[1.02] active:scale-[0.98] mb-4 flex items-center justify-center gap-3"
+                       className="w-full text-white font-black text-xl italic uppercase py-8 shadow-[0_20px_50px_rgba(255,40,0,0.3)] mb-4 flex items-center justify-center gap-3"
                     >
                        <Rocket size={24} fill="currentColor" />
                        {t("hero.cta")}
-                    </Button>
+                    </ShaderButton>
                     <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/50">
                        {t("hero.subtext")}
                     </div>
@@ -386,7 +378,7 @@ export default function App() {
 
                 <div className="flex flex-col gap-4">
                    {BIO_LINKS.map((link, i) => (
-                    <motion.button
+                    <ShaderButton
                       key={i}
                       onClick={() => {
                         if (link.link === "#") {
@@ -396,25 +388,26 @@ export default function App() {
                           window.open(link.link, "_blank");
                         }
                       }}
-                      whileHover={{ x: 10 }}
-                      className={cn(
-                        "group flex items-center justify-between p-6 rounded-[2rem] border transition-all duration-500",
-                        link.color.includes("bg-primary")
-                          ? "bg-primary text-black border-transparent"
-                          : "bg-white/[0.03] border-white/[0.05] hover:border-primary/20 text-white/40 hover:text-white"
-                      )}
+                      className="w-full group"
                     >
-                       <div className="flex items-center gap-5">
-                          <div className={cn(
-                            "p-3 rounded-2xl",
-                            link.color.includes("bg-primary") ? "bg-black/10" : "bg-white/5 group-hover:bg-primary/20 transition-colors"
-                          )}>
-                             <link.icon size={20} />
-                          </div>
-                          <span className="text-sm font-black uppercase tracking-widest text-white/90 group-hover:text-white transition-colors">{link.title}</span>
-                       </div>
-                       <ArrowUpRight size={18} className="text-white/60 group-hover:text-white group-hover:opacity-100 transition-all opacity-100" />
-                    </motion.button>
+                      <div className={cn(
+                        "flex items-center justify-between p-6 border transition-all duration-500",
+                        link.color.includes("bg-primary")
+                          ? "bg-transparent text-white border-transparent"
+                          : "bg-black/40 border-white/[0.05] hover:border-primary/20 text-white/40 hover:text-white"
+                      )}>
+                         <div className="flex items-center gap-5">
+                            <div className={cn(
+                              "p-3 rounded-2xl",
+                              link.color.includes("bg-primary") ? "bg-white/10" : "bg-white/5 group-hover:bg-primary/20 transition-colors"
+                            )}>
+                               <link.icon size={20} />
+                            </div>
+                            <span className="text-sm font-black uppercase tracking-widest text-white/90 group-hover:text-white transition-colors">{link.title}</span>
+                         </div>
+                         <ArrowUpRight size={18} className="text-white/60 group-hover:text-white group-hover:opacity-100 transition-all opacity-100" />
+                      </div>
+                    </ShaderButton>
                   ))}
                 </div>
               </section>
@@ -448,6 +441,8 @@ export default function App() {
                     ))}
                 </div>
                </section>
+
+               <CTASection />
 
                 <div className="mt-20 border-y border-white/5 py-12 overflow-hidden relative">
                    <motion.div 
