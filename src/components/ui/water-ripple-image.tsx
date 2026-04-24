@@ -189,11 +189,12 @@ export default function WaterRippleImage({
     src,
   });
 
-  const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+  const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.5) : 1; // Limit DPR on mobile to stay performant
 
   const updateUniforms = (gl: WebGLRenderingContext) => {
     const u = uniformsRef.current;
     if (u['u_blueish']) gl.uniform1f(u['u_blueish'], params.blueish);
+    // On mobile, reduce the scale effect slightly for performance if it feels "jumpy"
     if (u['u_scale']) gl.uniform1f(u['u_scale'], params.scale);
     if (u['u_illumination']) gl.uniform1f(u['u_illumination'], params.illumination);
     if (u['u_surface_distortion']) gl.uniform1f(u['u_surface_distortion'], params.surfaceDistortion);
@@ -238,10 +239,14 @@ export default function WaterRippleImage({
   const resize = () => {
     const gl = glRef.current;
     const canvas = canvasRef.current;
-    if (!gl || !canvas) return;
+    const container = canvas?.parentElement;
+    if (!gl || !canvas || !container) return;
 
-    const w = Math.floor(window.innerWidth * dpr);
-    const h = Math.floor(window.innerHeight * dpr);
+    // Use container bounds instead of window to avoid mobile scroll bug
+    const rect = container.getBoundingClientRect();
+    const w = Math.floor(rect.width * dpr);
+    const h = Math.floor(rect.height * dpr);
+
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;

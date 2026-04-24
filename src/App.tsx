@@ -275,12 +275,12 @@ export default function App() {
   return (
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
       {/* Background Effect - Always Visible */}
-      <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden">
-        <BackgroundShaders />
-        <div className="absolute inset-0 z-10 opacity-60 mix-blend-overlay">
+      <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden touch-none">
+        <BackgroundShaders isMobile={isMobile} />
+        <div className="absolute inset-0 z-10 opacity-60">
           <WaterRippleImage 
             blueish={0.0}
-            scale={8}
+            scale={isMobile ? 5 : 8}
             illumination={0.8}
             surfaceDistortion={0.1}
             waterDistortion={0.05}
@@ -472,13 +472,6 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Music Logic (Always mounted to warm up audio context) */}
-      <MusicPlayer 
-        videoId="qzyl0f3mRG0" 
-        isPlaying={isMusicPlaying} 
-        volume={musicVolume} 
-      />
 
       <AnimatePresence>
         {isDeveloping && (
