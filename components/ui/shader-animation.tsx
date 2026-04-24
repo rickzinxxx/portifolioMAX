@@ -16,7 +16,8 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    setIsMobile(mobileRegex.test(navigator.userAgent) || window.innerWidth < 1024);
   }, []);
 
   useEffect(() => {
@@ -68,8 +69,8 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
         float d = length(uv);
         vec3 col = vec3(0.0);
         
-        // Mobile optimization: fewer layers
-        int maxLayers = u_isMobile ? 2 : 4;
+        // Mobile optimization: fewer layers and simplified math
+        int maxLayers = u_isMobile ? 1 : 4;
         
         // Create multiple animated layers
         for(int i = 0; i < 4; i++) {
@@ -77,18 +78,13 @@ const ShaderAnimation = ({ phrases = [], onComplete }: ShaderAnimationProps) => 
           float fi = float(i);
           uv = fract(uv * 1.5) - 0.5;
           
-          d = length(uv) * exp(-length(uv0));
+          float d_layer = length(uv) * exp(-length(uv0));
           vec3 color = palette(length(uv0) + fi * 0.4 + u_time * 0.01);
           
-          d = sin(d * 4.0 + u_time) / 36.0;
-          d = pow(0.005 / d, 1.5);
+          d_layer = sin(d_layer * 4.0 + u_time) / 36.0;
+          d_layer = pow(0.005 / max(d_layer, 0.0001), 1.2);
           
-          // Mouse interaction (simplified)
-          vec2 mouseEffect = u_mouse - uv0;
-          float mouseDist = length(mouseEffect);
-          d *= 1.0 + sin(mouseDist * 10.0 - u_time * 2.0) * 0.1;
-          
-          col += color * d;
+          col += color * d_layer;
         }
         
         // Add wave distortion

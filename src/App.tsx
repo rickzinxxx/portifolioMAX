@@ -231,7 +231,8 @@ export default function App() {
   
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      setIsMobile(mobileRegex.test(navigator.userAgent) || window.innerWidth < 1024);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -277,15 +278,15 @@ export default function App() {
             className="fixed inset-0 z-[200]"
           >
             <WebGLHero onEnter={() => {
-              setIsCinematic(true);
+              // Direct user interaction to trigger audio and start experience
               setIsMusicPlaying(true);
-              // Force early play command to unlock audio context on mobile
-              // Interaction-based play is more likely to succeed
-              const unlockAudio = () => {
+              setIsCinematic(true);
+              
+              // Extra safety for mobile audio context
+              if (isMusicPlaying) {
                 setIsMusicPlaying(false);
-                setTimeout(() => setIsMusicPlaying(true), 50);
-              };
-              unlockAudio();
+                setTimeout(() => setIsMusicPlaying(true), 100);
+              }
             }} />
           </motion.div>
         )}
@@ -474,14 +475,12 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Music Logic */}
-      {(isCinematic || hasEntered) && (
-        <MusicPlayer 
-          videoId="qzyl0f3mRG0" 
-          isPlaying={isMusicPlaying} 
-          volume={musicVolume} 
-        />
-      )}
+      {/* Music Logic (Always mounted to warm up audio context) */}
+      <MusicPlayer 
+        videoId="qzyl0f3mRG0" 
+        isPlaying={isMusicPlaying} 
+        volume={musicVolume} 
+      />
 
       <AnimatePresence>
         {isDeveloping && (

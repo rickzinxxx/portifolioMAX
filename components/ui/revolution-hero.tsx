@@ -44,13 +44,14 @@ const fragmentShader = `
     float amplitude = 1.0;
     float frequency = 0.25;
     
-    int actualOctaves = u_isMobile ? 4 : octaves;
+    // Very aggressive optimization for mobile
+    int actualOctaves = u_isMobile ? 2 : octaves;
     
     for(int i = 0; i < 10; i++) {
       if(i >= actualOctaves) break;
       value += amplitude * noise(p * frequency);
-      amplitude *= 0.52;
-      frequency *= 1.13;
+      amplitude *= 0.5;
+      frequency *= 2.0;
     }
     return value;
   }
@@ -87,10 +88,12 @@ const fragmentShader = `
   
   vec2 curl(vec2 p, float time) {
     float eps = 0.5;
-    float n1 = fbm(p + vec2(eps, 0.0), 6);
-    float n2 = fbm(p - vec2(eps, 0.0), 6);
-    float n3 = fbm(p + vec2(0.0, eps), 6);
-    float n4 = fbm(p - vec2(0.0, eps), 6);
+    // Lower octaves for curl calculation on mobile
+    int curlOctaves = u_isMobile ? 2 : 6;
+    float n1 = fbm(p + vec2(eps, 0.0), curlOctaves);
+    float n2 = fbm(p - vec2(eps, 0.0), curlOctaves);
+    float n3 = fbm(p + vec2(0.0, eps), curlOctaves);
+    float n4 = fbm(p - vec2(0.0, eps), curlOctaves);
     return vec2((n3 - n4) / (2.0 * eps), (n2 - n1) / (2.0 * eps));
   }
 
@@ -109,24 +112,26 @@ const fragmentShader = `
     vec2 curlForce = curl(st * 1.5, time * 0.5) * (u_isMobile ? 0.3 : 0.6);
     vec2 flowField = st + curlForce;
     
-    float dist1 = fbm(flowField * 1.5 + time * 0.8, u_isMobile ? 3 : 8) * 0.4;
-    float dist2 = fbm(flowField * 2.3 - time * 0.6, u_isMobile ? 2 : 6) * 0.3;
+    float dist1 = fbm(flowField * 1.5 + time * 0.8, u_isMobile ? 2 : 8) * 0.4;
+    float dist2 = fbm(flowField * 2.3 - time * 0.6, u_isMobile ? 1 : 6) * 0.3;
     float dist3 = u_isMobile ? 0.0 : fbm(flowField * 3.1 + time * 1.2, 4) * 0.2;
     float dist4 = u_isMobile ? 0.0 : fbm(flowField * 4.7 - time * 0.9, 3) * 0.15;
     
-    float cells = voronoi(flowField * (u_isMobile ? 1.5 : 2.5) + time * 0.4);
+    float cells = voronoi(flowField * (u_isMobile ? 1.2 : 2.5) + time * 0.4);
     cells = smoothstep(0.1, 0.7, cells);
     
     float plasmaEffect = plasma(flowField + vec2(dist1, dist2), time * 1.5) * 0.2;
     float totalDist = dist1 + dist2 + dist3 + dist4 + plasmaEffect;
     
     float streak1 = sin((st.x + totalDist) * 15.0 + time * 3.0) * 0.5 + 0.5;
-    float streak2 = sin((st.x + totalDist * 0.7) * 25.0 - time * 2.0) * 0.5 + 0.5;
-    float streak3 = sin((st.x + totalDist * 1.3) * 35.0 + time * 4.0) * 0.5 + 0.5;
+    float streak2 = u_isMobile ? 0.0 : sin((st.x + totalDist * 0.7) * 25.0 - time * 2.0) * 0.5 + 0.5;
+    float streak3 = u_isMobile ? 0.0 : sin((st.x + totalDist * 1.3) * 35.0 + time * 4.0) * 0.5 + 0.5;
     
     streak1 = smoothstep(0.3, 0.7, streak1);
-    streak2 = smoothstep(0.2, 0.8, streak2);
-    streak3 = smoothstep(0.4, 0.6, streak3);
+    if (!u_isMobile) {
+      streak2 = smoothstep(0.2, 0.8, streak2);
+      streak3 = smoothstep(0.4, 0.6, streak3);
+    }
     
     float combinedStreaks = streak1 * 0.6 + streak2 * 0.4 + streak3 * 0.5;
     
@@ -294,7 +299,9 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
 
     const handleResize = () => {
       const rect = canvas.getBoundingClientRect()
-      const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio, 2)
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      const dpr = isMobile ? 0.75 : Math.min(window.devicePixelRatio, 2)
       canvas.width = rect.width * dpr
       canvas.height = rect.height * dpr
       gl.viewport(0, 0, canvas.width, canvas.height)
