@@ -24,8 +24,10 @@ import {
   Languages,
   ChevronRight,
   ChevronLeft,
-  Rocket
+  Rocket,
+  ShieldAlert
 } from "lucide-react";
+import SecurityShield from "./components/SecurityShield";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -276,6 +278,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
+      <SecurityShield />
       {/* Background Effect - Always Visible */}
       <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden touch-none">
         <BackgroundShaders isMobile={isMobile} />
