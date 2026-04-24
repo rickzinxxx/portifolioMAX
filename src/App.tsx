@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Lenis from "lenis";
 import { useTranslation } from "react-i18next";
@@ -33,67 +33,78 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "./components/ui/dropdown-menu";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import AnimatedGradientBackground from "@/components/ui/animated-gradient-background";
-import WebGLHero from "@/components/ui/revolution-hero";
-import { SpotifyCard } from "@/components/ui/spotify-card";
-import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "@/components/ui/animated-pricing-cards";
-import { Sparkles } from "@/components/ui/sparkles";
-import InteractiveWaveShader from "@/components/ui/flowing-waves-shader";
-import { Hero3D } from "@/components/ui/hero-3d";
+import AnimatedGradientBackground from "./components/ui/animated-gradient-background";
+import WebGLHero from "./components/ui/revolution-hero";
+import { WaterRippleImage } from "./components/ui/water-ripple-image";
+import { SpotifyCard } from "./components/ui/spotify-card";
+import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "./components/ui/animated-pricing-cards";
+import { Sparkles } from "./components/ui/sparkles";
+import InteractiveWaveShader from "./components/ui/flowing-waves-shader";
+import { Hero3D } from "./components/ui/hero-3d";
+import BackgroundShaders from "./components/ui/background-shaders";
+
+interface MusicPlayerHandle {
+  sendMessage: (func: string, args?: any[]) => void;
+}
 
 // Hidden music player logic
-const MusicPlayer = ({ isPlaying, volume, videoId }: { isPlaying: boolean, volume: number, videoId: string }) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+const MusicPlayer = forwardRef<MusicPlayerHandle, { isPlaying: boolean, volume: number, videoId: string }>(
+  ({ isPlaying, volume, videoId }, ref) => {
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const [isLoaded, setIsLoaded] = useState(false);
 
-  const sendMessage = (func: string, args: any[] = []) => {
-    if (!iframeRef.current || !isLoaded) return;
-    try {
-      iframeRef.current.contentWindow?.postMessage(JSON.stringify({
-        event: 'command',
-        func: func,
-        args: args
-      }), '*');
-    } catch (e) {
-      console.error("Youtube postMessage failed", e);
-    }
-  };
+    const sendMessage = (func: string, args: any[] = []) => {
+      if (!iframeRef.current || !isLoaded) return;
+      try {
+        iframeRef.current.contentWindow?.postMessage(JSON.stringify({
+          event: 'command',
+          func: func,
+          args: args
+        }), '*');
+      } catch (e) {
+        console.error("Youtube postMessage failed", e);
+      }
+    };
 
-  useEffect(() => {
-    if (isLoaded) {
-      const act = () => {
-        sendMessage(isPlaying ? 'playVideo' : 'pauseVideo');
+    useImperativeHandle(ref, () => ({
+      sendMessage
+    }));
+
+    useEffect(() => {
+      if (isLoaded) {
         if (isPlaying) {
-          // Robust retry for autoplay unlocks
-          setTimeout(() => sendMessage('playVideo'), 100);
-          setTimeout(() => sendMessage('playVideo'), 500);
-          setTimeout(() => sendMessage('playVideo'), 1000);
+          sendMessage('playVideo');
+          const retries = [100, 500, 1000, 2000, 3000];
+          retries.forEach(delay => setTimeout(() => sendMessage('playVideo'), delay));
+        } else {
+          sendMessage('pauseVideo');
         }
-      };
-      act();
-    }
-  }, [isPlaying, isLoaded]);
+      }
+    }, [isPlaying, isLoaded]);
 
-  useEffect(() => {
-    if (isLoaded) {
-      sendMessage('setVolume', [volume]);
-    }
-  }, [volume, isLoaded]);
+    useEffect(() => {
+      if (isLoaded) {
+        sendMessage('setVolume', [volume]);
+      }
+    }, [volume, isLoaded]);
 
-  return (
-    <div className="fixed -top-full -left-full w-0 h-0 opacity-0 pointer-events-none overflow-hidden" aria-hidden="true">
-      <iframe
-        ref={iframeRef}
-        onLoad={() => setIsLoaded(true)}
-        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&showinfo=0&rel=0&version=3&loop=1&playlist=${videoId}`}
-        allow="autoplay; encrypted-media"
-        title="background-music"
-      />
-    </div>
-  );
-};
+    return (
+      <div className="fixed top-0 left-0 w-[1px] h-[1px] opacity-0 pointer-events-none overflow-hidden z-[-1]" aria-hidden="true">
+        <iframe
+          ref={iframeRef}
+          onLoad={() => setIsLoaded(true)}
+          src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=0&controls=0&showinfo=0&rel=0&version=3&loop=1&playlist=${videoId}&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&widgetid=1`}
+          allow="autoplay; encrypted-media"
+          title="background-music"
+          width="1"
+          height="1"
+        />
+      </div>
+    );
+  }
+);
 
 const Raycast = () => (
   <svg viewBox="0 0 180 56" fill="currentColor" className="w-full">
@@ -221,6 +232,7 @@ const LanguageSwitcher = () => {
 export default function App() {
   const { t, i18n } = useTranslation();
   const [hasEntered, setHasEntered] = useState(false);
+  const musicPlayerRef = useRef<MusicPlayerHandle>(null);
   const [isCinematic, setIsCinematic] = useState(false);
   const [isDeveloping, setIsDeveloping] = useState(false);
   const [devTitle, setDevTitle] = useState("");
@@ -262,7 +274,21 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
-      
+      {/* Background Effect - Always Visible */}
+      <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden">
+        <BackgroundShaders />
+        <div className="absolute inset-0 z-10 opacity-60 mix-blend-overlay">
+          <WaterRippleImage 
+            blueish={0.0}
+            scale={8}
+            illumination={0.8}
+            surfaceDistortion={0.1}
+            waterDistortion={0.05}
+            src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=1920"
+          />
+        </div>
+      </div>
+
       <AnimatePresence mode="wait">
         {!hasEntered && !isCinematic && (
           <motion.div 
@@ -270,8 +296,7 @@ export default function App() {
             initial={{ opacity: 1 }}
             exit={{ 
               opacity: 0, 
-              scale: 1.1,
-              transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
+              transition: { duration: 0.3 } 
             }}
             className="fixed inset-0 z-[200]"
           >
@@ -279,6 +304,12 @@ export default function App() {
               // Direct user interaction to trigger audio and start experience
               setIsMusicPlaying(true);
               setHasEntered(true);
+              
+              // CRITICAL: Trigger playback immediately on user gesture for mobile
+              musicPlayerRef.current?.sendMessage('playVideo');
+              // Extra attempts for stability
+              setTimeout(() => musicPlayerRef.current?.sendMessage('playVideo'), 100);
+              setTimeout(() => musicPlayerRef.current?.sendMessage('playVideo'), 500);
             }} />
           </motion.div>
         )}
@@ -288,7 +319,7 @@ export default function App() {
             key="site-content"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.4 }}
             className="relative w-full"
           >
             <div className="fixed bottom-6 right-6 z-[100] pointer-events-none">
@@ -305,14 +336,7 @@ export default function App() {
                </motion.div>
             </div>
 
-            {/* Interactive Background Shader for the main site */}
-            <div className="fixed inset-0 z-0 bg-black pointer-events-none">
-               <Hero3D />
-               <div className="absolute inset-0 opacity-40">
-                  <InteractiveWaveShader colorMode="red" disableDimming={true} />
-               </div>
-            </div>
-
+            {/* Content Container */}
             <motion.main 
               key="content"
               className="relative z-10 w-full flex flex-col items-center pb-0"
@@ -502,6 +526,12 @@ export default function App() {
             </motion.div>
           </motion.div>
         )}
+        <MusicPlayer 
+          ref={musicPlayerRef}
+          isPlaying={isMusicPlaying} 
+          volume={musicVolume} 
+          videoId="qD0_yWlsH7s" 
+        />
       </AnimatePresence>
 
       <style>{`

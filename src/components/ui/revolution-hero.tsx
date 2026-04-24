@@ -371,8 +371,8 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
   }, [initGL])
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-black">
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ background: "#000" }} />
+    <section className="relative h-screen w-full overflow-hidden bg-transparent">
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ background: "transparent" }} />
 
       <div className="relative z-10 h-full flex flex-col justify-end p-12 md:p-24">
         <div className="flex flex-col">
