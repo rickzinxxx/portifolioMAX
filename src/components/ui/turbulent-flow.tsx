@@ -279,48 +279,50 @@ export const TurbulentFlow = ({ children }: TurbulentFlowProps) => {
     materialRef.current = material;
 
     // Enhanced GSAP animation timeline
-    const tl = gsap.timeline({ repeat: -1 });
-    
-    tl.to(material.uniforms.u_turbulence, {
-      value: 1.2,
-      duration: 6,
-      ease: "sine.inOut"
-    })
-    .to(material.uniforms.u_noise_scale, {
-      value: 6.0,
-      duration: 8,
-      ease: "power2.inOut"
-    }, 0)
-    .to(material.uniforms.u_distortion, {
-      value: 0.25,
-      duration: 7,
-      ease: "power1.inOut"
-    }, 1)
-        .to(material.uniforms.u_sharpness, {
-      value: 1.8,
-      duration: 5,
-      ease: "power2.inOut"
-    }, 2)
-    .to(material.uniforms.u_turbulence, {
-      value: 0.4,
-      duration: 9,
-      ease: "sine.inOut"
-    })
-    .to(material.uniforms.u_noise_scale, {
-      value: 2.5,
-      duration: 10,
-      ease: "power2.inOut"
-    }, "-=4")
-    .to(material.uniforms.u_distortion, {
-      value: 0.08,
-      duration: 8,
-      ease: "power1.inOut"
-    }, "-=6")
-    .to(material.uniforms.u_sharpness, {
-      value: 1.0,
-      duration: 7,
-      ease: "power2.inOut"
-    }, "-=5");
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ repeat: -1 });
+      
+      tl.to(material.uniforms.u_turbulence, {
+        value: 1.2,
+        duration: 6,
+        ease: "sine.inOut"
+      })
+      .to(material.uniforms.u_noise_scale, {
+        value: 6.0,
+        duration: 8,
+        ease: "power2.inOut"
+      }, 0)
+      .to(material.uniforms.u_distortion, {
+        value: 0.25,
+        duration: 7,
+        ease: "power1.inOut"
+      }, 1)
+          .to(material.uniforms.u_sharpness, {
+        value: 1.8,
+        duration: 5,
+        ease: "power2.inOut"
+      }, 2)
+      .to(material.uniforms.u_turbulence, {
+        value: 0.4,
+        duration: 9,
+        ease: "sine.inOut"
+      })
+      .to(material.uniforms.u_noise_scale, {
+        value: 2.5,
+        duration: 10,
+        ease: "power2.inOut"
+      }, "-=4")
+      .to(material.uniforms.u_distortion, {
+        value: 0.08,
+        duration: 8,
+        ease: "power1.inOut"
+      }, "-=6")
+      .to(material.uniforms.u_sharpness, {
+        value: 1.0,
+        duration: 7,
+        ease: "power2.inOut"
+      }, "-=5");
+    }, mountRef);
 
     // Mouse interaction for additional turbulence
     let mouseX = 0;
@@ -377,7 +379,7 @@ export const TurbulentFlow = ({ children }: TurbulentFlowProps) => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
-      tl.kill();
+      ctx.revert();
       if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
       }

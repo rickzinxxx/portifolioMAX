@@ -10,7 +10,6 @@ import { useTranslation } from "react-i18next";
 import "./lib/i18n";
 import { 
   Instagram, 
-  Github, 
   Linkedin, 
   Mail, 
   ExternalLink, 
@@ -40,7 +39,8 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import AnimatedGradientBackground from "./components/ui/animated-gradient-background";
 import WebGLHero from "./components/ui/revolution-hero";
 import { WaterRippleImage } from "./components/ui/water-ripple-image";
-import { SpotifyCard } from "./components/ui/spotify-card";
+import LandingPage from "./components/ui/landing-page";
+import { HorizonHeroSection } from "./components/ui/horizon-hero-section";
 import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "./components/ui/animated-pricing-cards";
 import { Sparkles } from "./components/ui/sparkles";
 import InteractiveWaveShader from "./components/ui/flowing-waves-shader";
@@ -170,17 +170,7 @@ const PROJECTS = [
 const BIO_LINKS = [
   { title: "WhatsApp Business", icon: ExternalLink, link: "https://wa.me/558199130885", color: "bg-primary text-black" },
   { title: "Instagram Oficial", icon: Instagram, link: "https://www.instagram.com/rickzinxx_/", color: "bg-white/5" },
-  { title: "GitHub Repositories", icon: Github, link: "https://github.com/rickzinxxx", color: "bg-white/5" },
   { title: "LinkedIn Pro", icon: Linkedin, link: "#", color: "bg-white/5" },
-];
-
-const THEME_SONG = [
-  {
-    title: "Malvadão 3",
-    artists: "Xamã",
-    duration: 180,
-    albumArt: "https://i.scdn.co/image/ab67616d0000b273b7a70197793a4604e3895726"
-  }
 ];
 
 const ANIM_VARIANTS = {
@@ -280,7 +270,7 @@ export default function App() {
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
       <SecurityShield />
       {/* Background Effect - Always Visible */}
-      <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden touch-none">
+      <div className="fixed inset-0 z-[-1] bg-black pointer-events-none overflow-hidden touch-none">
         <BackgroundShaders isMobile={isMobile} />
       </div>
 
@@ -317,25 +307,13 @@ export default function App() {
             transition={{ duration: 0.4 }}
             className="relative w-full"
           >
-            <div className="fixed bottom-6 right-6 z-[100] pointer-events-none">
-               <motion.div
-                 initial={{ opacity: 0, x: 50, filter: "blur(10px)" }}
-                 animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                 transition={{ duration: 1, delay: 1 }}
-               >
-                 <SpotifyCard 
-                   songs={THEME_SONG} 
-                   onPlayStateChange={setIsMusicPlaying}
-                   onVolumeChange={setMusicVolume}
-                 />
-               </motion.div>
-            </div>
-
             {/* Content Container */}
             <motion.main 
               key="content"
               className="relative z-10 w-full flex flex-col items-center pb-0"
             >
+              <HorizonHeroSection />
+
               {/* Main Content Sections */}
               <div className="w-full max-w-4xl mx-auto px-6 pt-32 flex flex-col items-center gap-32">
                 {/* Part 2: Connect & Business */}
@@ -464,8 +442,11 @@ export default function App() {
                    </motion.div>
                 </div>
 
-              </div>
+                <section className="w-full mt-32 relative">
+                   <LandingPage />
+                </section>
 
+              </div>
             </motion.main>
           </motion.div>
         )}

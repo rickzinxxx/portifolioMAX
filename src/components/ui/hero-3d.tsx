@@ -111,20 +111,26 @@ export const Hero3D: React.FC = () => {
     animate();
 
     // GSAP MOUSE INTERACTION
-    const onMouseMove = (event: MouseEvent) => {
-      const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    const ctx = gsap.context(() => {
+      const onMouseMove = (event: MouseEvent) => {
+        const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
 
-      if (meshRef.current) {
-        gsap.to(meshRef.current.position, {
-          x: mouseX * 0.5,
-          y: mouseY * 0.5,
-          duration: 1.5,
-          ease: 'power2.out'
-        });
-      }
-    };
-    window.addEventListener('mousemove', onMouseMove);
+        if (meshRef.current) {
+          gsap.to(meshRef.current.position, {
+            x: mouseX * 0.5,
+            y: mouseY * 0.5,
+            duration: 1.5,
+            overwrite: true,
+            ease: 'power2.out'
+          });
+        }
+      };
+      window.addEventListener('mousemove', onMouseMove);
+      
+      // Store in state or just access in cleanup
+      (ctx as any)._onMouseMove = onMouseMove;
+    }, containerRef);
 
     // RESIZE
     const handleResize = () => {
@@ -136,8 +142,9 @@ export const Hero3D: React.FC = () => {
     window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mousemove', (ctx as any)._onMouseMove);
       window.removeEventListener('resize', handleResize);
+      ctx.revert();
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
