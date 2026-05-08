@@ -184,34 +184,33 @@ function NavLink({ children, onClick, gradient }: NavLinkProps) {
     const link = linkRef.current
     if (!link || isMobile) return
 
-    const ctx = gsap.context(() => {
-      const handleMouseEnter = () => {
-        gsap.to(link, {
-          scale: 1.05,
-          rotationX: -2,
-          z: 20,
-          duration: 0.6,
-          ease: "power3.out",
-        })
-      }
+    const handleMouseEnter = () => {
+      gsap.to(link, {
+        scale: 1.05,
+        rotationX: -2,
+        z: 20,
+        duration: 0.6,
+        ease: "power3.out",
+      })
+    }
 
-      const handleMouseLeave = () => {
-        gsap.to(link, {
-          scale: 1,
-          rotationX: 0,
-          z: 0,
-          duration: 0.6,
-          ease: "power3.out",
-        })
-      }
+    const handleMouseLeave = () => {
+      gsap.to(link, {
+        scale: 1,
+        rotationX: 0,
+        z: 0,
+        duration: 0.6,
+        ease: "power3.out",
+      })
+    }
 
-      link.addEventListener("mouseenter", handleMouseEnter)
-      link.addEventListener("mouseleave", handleMouseLeave)
-    }, linkRef);
+    link.addEventListener("mouseenter", handleMouseEnter)
+    link.addEventListener("mouseleave", handleMouseLeave)
 
     return () => {
-      ctx.revert();
-    };
+      link.removeEventListener("mouseenter", handleMouseEnter)
+      link.removeEventListener("mouseleave", handleMouseLeave)
+    }
   }, [])
 
   return (
@@ -321,7 +320,6 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
   useEffect(() => {
     const cleanupResize = initGL()
     
-    const intensityObj = { value: globalIntensity };
     const handleMouseMove = (e: MouseEvent) => {
       const canvas = canvasRef.current
       if (!canvas) return
@@ -329,20 +327,18 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
       mouseRef.current.x = (e.clientX - rect.left) * window.devicePixelRatio
       mouseRef.current.y = (rect.height - (e.clientY - rect.top)) * window.devicePixelRatio
 
-      gsap.to(intensityObj, {
-        value: 1.2,
+      gsap.to({ intensity: globalIntensity }, {
+        intensity: 1.2,
         duration: 0.3,
-        overwrite: true,
         ease: "power2.out",
-        onUpdate: () => setGlobalIntensity(intensityObj.value)
+        onUpdate: function() { setGlobalIntensity(this.targets()[0].intensity) }
       })
-      gsap.to(intensityObj, {
-        value: 1.0,
+      gsap.to({ intensity: 1.2 }, {
+        intensity: 1.0,
         duration: 1.2,
         delay: 0.1,
-        overwrite: "auto",
         ease: "power2.out",
-        onUpdate: () => setGlobalIntensity(intensityObj.value)
+        onUpdate: function() { setGlobalIntensity(this.targets()[0].intensity) }
       })
     }
     window.addEventListener("mousemove", handleMouseMove)

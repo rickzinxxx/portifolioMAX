@@ -40,7 +40,6 @@ import AnimatedGradientBackground from "./components/ui/animated-gradient-backgr
 import WebGLHero from "./components/ui/revolution-hero";
 import { WaterRippleImage } from "./components/ui/water-ripple-image";
 import LandingPage from "./components/ui/landing-page";
-import { HorizonHeroSection } from "./components/ui/horizon-hero-section";
 import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "./components/ui/animated-pricing-cards";
 import { Sparkles } from "./components/ui/sparkles";
 import InteractiveWaveShader from "./components/ui/flowing-waves-shader";
@@ -270,7 +269,7 @@ export default function App() {
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
       <SecurityShield />
       {/* Background Effect - Always Visible */}
-      <div className="fixed inset-0 z-[-1] bg-black pointer-events-none overflow-hidden touch-none">
+      <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden touch-none">
         <BackgroundShaders isMobile={isMobile} />
       </div>
 
@@ -312,8 +311,6 @@ export default function App() {
               key="content"
               className="relative z-10 w-full flex flex-col items-center pb-0"
             >
-              <HorizonHeroSection />
-
               {/* Main Content Sections */}
               <div className="w-full max-w-4xl mx-auto px-6 pt-32 flex flex-col items-center gap-32">
                 {/* Part 2: Connect & Business */}
@@ -447,6 +444,7 @@ export default function App() {
                 </section>
 
               </div>
+
             </motion.main>
           </motion.div>
         )}
