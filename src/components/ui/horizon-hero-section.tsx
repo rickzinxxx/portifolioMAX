@@ -49,12 +49,13 @@ export const HorizonHeroSection = () => {
 
   // Initialize Three.js
   useEffect(() => {
+    const isMobile = window.innerWidth < 768;
     const initThree = () => {
       const { current: refs } = threeRefs;
       
       // Scene setup
       refs.scene = new THREE.Scene();
-      refs.scene.fog = new THREE.FogExp2(0x050000, 0.0008); // Dark Red fog
+      refs.scene.fog = new THREE.FogExp2(0x050000, 0.0008);
 
       // Camera
       refs.camera = new THREE.PerspectiveCamera(
@@ -69,15 +70,14 @@ export const HorizonHeroSection = () => {
       // Renderer
       refs.renderer = new THREE.WebGLRenderer({
         canvas: canvasRef.current!,
-        antialias: true,
+        antialias: !isMobile,
         alpha: true,
         powerPreference: "high-performance"
       });
       refs.renderer.setSize(window.innerWidth, window.innerHeight);
-      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
       refs.renderer.toneMapping = THREE.ACESFilmicToneMapping;
       refs.renderer.toneMappingExposure = 1.0;
-
 
       // Post-processing
       refs.composer = new EffectComposer(refs.renderer);
@@ -86,15 +86,15 @@ export const HorizonHeroSection = () => {
 
       const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        0.8,
+        isMobile ? 0.5 : 0.8,
         0.4,
         0.85
       );
       refs.composer.addPass(bloomPass);
 
       // Create scene elements
-      createStarField();
-      createNebula();
+      createStarField(isMobile);
+      createNebula(isMobile);
       createMountains();
       createAtmosphere();
       
@@ -111,11 +111,11 @@ export const HorizonHeroSection = () => {
       setIsReady(true);
     };
 
-    const createStarField = () => {
+    const createStarField = (isMobile: boolean) => {
       const { current: refs } = threeRefs;
-      const starCount = 5000;
+      const starCount = isMobile ? 1500 : 5000;
       
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < (isMobile ? 2 : 3); i++) {
         const geometry = new THREE.BufferGeometry();
         const positions = new Float32Array(starCount * 3);
         const colors = new Float32Array(starCount * 3);
@@ -138,12 +138,11 @@ export const HorizonHeroSection = () => {
             color.setHSL(0, 1.0, 0.6); // Pure Red stars
           }
 
-          
           colors[j * 3] = color.r;
           colors[j * 3 + 1] = color.g;
           colors[j * 3 + 2] = color.b;
 
-          sizes[j] = Math.random() * 2 + 0.5;
+          sizes[j] = Math.random() * (isMobile ? 1.5 : 2) + 0.5;
         }
 
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -193,17 +192,16 @@ export const HorizonHeroSection = () => {
       }
     };
 
-    const createNebula = () => {
+    const createNebula = (isMobile: boolean) => {
       const { current: refs } = threeRefs;
-      const geometry = new THREE.PlaneGeometry(8000, 4000, 100, 100);
+      const geometry = new THREE.PlaneGeometry(8000, 4000, isMobile ? 32 : 100, isMobile ? 32 : 100);
       const material = new THREE.ShaderMaterial({
         uniforms: {
           time: { value: 0 },
-          color1: { value: new THREE.Color(0xff0000) }, // Brand Red
-          color2: { value: new THREE.Color(0x330000) }, // Deep Dark Red
+          color1: { value: new THREE.Color(0xff0000) },
+          color2: { value: new THREE.Color(0x330000) },
           opacity: { value: 0.3 }
         },
-
         vertexShader: `
           varying vec2 vUv;
           varying float vElevation;
@@ -414,26 +412,35 @@ export const HorizonHeroSection = () => {
       if (titleRef.current) {
         const titleChars = titleRef.current.querySelectorAll('.title-char');
         if (titleChars.length > 0) {
-          tl.from(titleChars, {
-            y: 200,
-            opacity: 0,
-            duration: 1.5,
-            stagger: 0.05,
-            ease: "power4.out"
-          });
+          tl.fromTo(titleChars, 
+            { y: "150%", opacity: 0, rotateX: -60 },
+            { 
+              y: "0%", 
+              opacity: 1, 
+              rotateX: 0,
+              duration: 1.8, 
+              stagger: 0.03, 
+              ease: "expo.out" 
+            }
+          );
         }
       }
 
       if (subtitleRef.current) {
         const subtitleLines = subtitleRef.current.querySelectorAll('.subtitle-line');
         if (subtitleLines.length > 0) {
-          tl.from(subtitleLines, {
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            stagger: 0.2,
-            ease: "power3.out"
-          }, titleRef.current ? "-=0.8" : 0);
+          tl.fromTo(subtitleLines, 
+            { y: 30, opacity: 0, filter: "blur(10px)" },
+            { 
+              y: 0, 
+              opacity: 1, 
+              filter: "blur(0px)",
+              duration: 1.2, 
+              stagger: 0.15, 
+              ease: "power2.out" 
+            }, 
+            "-=1.2"
+          );
         }
       }
 
@@ -506,11 +513,20 @@ export const HorizonHeroSection = () => {
   }, [totalSections]);
 
   const splitTitle = (text: string) => {
-    return text.split('').map((char, i) => (
-      <span key={i} className="title-char">
-        {char}
+    return (
+      <span className="flex flex-wrap justify-center gap-[0.1em]" translate="no">
+        {text.split(' ').map((word, wordIndex) => (
+          <span key={wordIndex} className="inline-block whitespace-nowrap">
+            {word.split('').map((char, charIndex) => (
+              <span key={charIndex} className="title-char inline-block translate-y-[120%] opacity-0">
+                {char}
+              </span>
+            ))}
+            {wordIndex < text.split(' ').length - 1 && <span className="inline-block">&nbsp;</span>}
+          </span>
+        ))}
       </span>
-    ));
+    );
   };
 
   const sectionsData = [
@@ -537,23 +553,23 @@ export const HorizonHeroSection = () => {
       
       <div className="scroll-sections relative z-10 w-full">
         {sectionsData.map((section, i) => (
-          <section key={i} className="content-section min-h-[120vh] flex flex-col items-center justify-center text-center px-4 relative">
-            <div className="max-w-6xl mx-auto">
+          <section key={i} className="content-section min-h-[120vh] flex flex-col items-center justify-center text-center px-4 relative pointer-events-none">
+            <div className="max-w-6xl mx-auto w-full">
               <h1 
                 ref={i === 0 ? titleRef : null}
-                className="hero-title text-5xl md:text-8xl lg:text-[11rem] font-black tracking-tighter leading-none mb-8 overflow-hidden italic uppercase text-white drop-shadow-[0_0_30px_rgba(255,40,0,0.8)]"
+                className="hero-title text-[10vw] md:text-8xl lg:text-[11rem] font-black tracking-tighter leading-[0.8] mb-8 overflow-visible italic uppercase text-white drop-shadow-[0_0_30px_rgba(255,40,0,0.8)]"
               >
                 {splitTitle(section.title)}
               </h1>
           
               <div 
                 ref={i === 0 ? subtitleRef : null}
-                className="hero-subtitle text-base md:text-xl font-bold tracking-widest text-white max-w-3xl mx-auto uppercase leading-relaxed bg-black/40 backdrop-blur-sm p-6 rounded-2xl border border-white/5"
+                className="hero-subtitle text-sm md:text-xl font-bold tracking-widest text-white max-w-3xl mx-auto uppercase leading-relaxed bg-black/40 backdrop-blur-md p-4 md:p-8 rounded-2xl border border-white/5 pointer-events-auto"
               >
-                <p className="subtitle-line mb-4 drop-shadow-[0_2px_15px_rgba(0,0,0,0.8)] px-4">
+                <p className="subtitle-line mb-2 md:mb-4 drop-shadow-[0_2px_15px_rgba(0,0,0,0.8)] px-2 md:px-4">
                   {section.sub1}
                 </p>
-                <p className="subtitle-line text-primary drop-shadow-[0_0_10px_rgba(255,40,0,0.5)] px-4">
+                <p className="subtitle-line text-primary drop-shadow-[0_0_10px_rgba(255,40,0,0.5)] px-2 md:px-4">
                   {section.sub2}
                 </p>
               </div>
