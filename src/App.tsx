@@ -24,7 +24,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Rocket,
-  ShieldAlert
+  ShieldAlert,
+  WifiOff
 } from "lucide-react";
 import SecurityShield from "./components/SecurityShield";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -48,6 +49,7 @@ import BackgroundShaders from "./components/ui/background-shaders";
 import { ShaderButton } from "./components/ui/shader-button";
 import { CTASection } from "./components/ui/hero-dithering-card";
 import { AreaChart, Area, Grid, XAxis, YAxis, ChartTooltip } from "./components/ui/area-chart";
+import { OfflinePage } from "./components/ui/offline-page";
 
 interface MusicPlayerHandle {
   sendMessage: (func: string, args?: any[]) => void;
@@ -225,6 +227,14 @@ const LanguageSwitcher = () => {
         >
           English
         </DropdownMenuItem>
+        <div className="h-[1px] bg-white/10 my-1" />
+        <DropdownMenuItem 
+          onClick={() => setIsOffline(true)}
+          className="text-red-500 hover:bg-red-500 hover:text-white focus:bg-red-500 focus:text-white cursor-pointer font-bold uppercase text-[10px] tracking-widest flex items-center gap-2"
+        >
+          <WifiOff className="w-3 h-3" />
+          Simulate Offline
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -241,6 +251,20 @@ export default function App() {
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [musicVolume, setMusicVolume] = useState(75);
   const [isMobile, setIsMobile] = useState(false);
+  const [isOffline, setIsOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false);
+  
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   
   useEffect(() => {
     const checkMobile = () => {
@@ -283,7 +307,17 @@ export default function App() {
       </div>
 
       <AnimatePresence mode="wait">
-        {!hasEntered && !isCinematic && (
+        {isOffline ? (
+          <motion.div
+            key="offline-screen"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[5000]"
+          >
+            <OfflinePage />
+          </motion.div>
+        ) : !hasEntered && !isCinematic && (
           <motion.div 
             key="intro-overlay"
             initial={{ opacity: 1 }}
