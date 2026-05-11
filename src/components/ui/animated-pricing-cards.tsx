@@ -42,7 +42,7 @@ export const PricingWrapper: React.FC<{
 }> = ({ children, contactHref, className, type = 'waves', color = 'bg-primary' }) => (
   <article
     className={cn(
-      'min-h-[400px] h-full max-w-sm w-full relative overflow-hidden rounded-[2.5rem] text-white p-8 group transition-all duration-500 border border-white/5 hover:border-white/10',
+      'min-h-[400px] h-full max-w-sm w-full relative overflow-hidden rounded-[2.5rem] text-white p-6 group transition-all duration-500 border border-white/5 hover:border-white/10',
       color,
       className
     )}

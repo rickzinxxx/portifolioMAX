@@ -339,7 +339,7 @@ function QuickAction({ icon, label, onClick }: QuickActionProps) {
     <Button
       variant="outline"
       onClick={onClick}
-      className="flex items-center gap-2 rounded-full border-white/10 bg-black/40 text-neutral-300 hover:text-white hover:bg-primary hover:text-black hover:border-transparent transition-all backdrop-blur-md h-9 px-4 group"
+      className="flex items-center gap-2 rounded-full border-white/10 bg-black/40 text-neutral-300 hover:text-white hover:bg-primary hover:text-black hover:border-transparent transition-all backdrop-blur-md h-8 px-3 group"
     >
       <span className="opacity-70 group-hover:opacity-100">{icon}</span>
       <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>

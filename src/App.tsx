@@ -47,6 +47,7 @@ import { Hero3D } from "./components/ui/hero-3d";
 import BackgroundShaders from "./components/ui/background-shaders";
 import { ShaderButton } from "./components/ui/shader-button";
 import { CTASection } from "./components/ui/hero-dithering-card";
+import { AreaChart, Area, Grid, XAxis, YAxis, ChartTooltip } from "./components/ui/area-chart";
 
 interface MusicPlayerHandle {
   sendMessage: (func: string, args?: any[]) => void;
@@ -164,6 +165,14 @@ const PROJECTS = [
     link: "https://techify-max.vercel.app",
     image: "https://images.unsplash.com/photo-1551288049-bbdac8a28a1e?q=80&w=2070&auto=format&fit=crop"
   }
+];
+
+const EARNINGS_DATA = [
+  { date: new Date(2026, 0, 1), revenue: 200 },
+  { date: new Date(2026, 1, 1), revenue: 500 },
+  { date: new Date(2026, 2, 1), revenue: 1200 },
+  { date: new Date(2026, 3, 1), revenue: 3400 },
+  { date: new Date(2026, 4, 1), revenue: 7600 },
 ];
 
 const BIO_LINKS = [
@@ -312,11 +321,11 @@ export default function App() {
               className="relative z-10 w-full flex flex-col items-center pb-0"
             >
               {/* Main Content Sections */}
-              <div className="w-full max-w-4xl mx-auto px-6 pt-32 flex flex-col items-center gap-32">
+              <div className="w-full max-w-4xl mx-auto px-6 pt-20 flex flex-col items-center gap-20">
                 {/* Part 2: Connect & Business */}
                 <section className="w-full max-w-2xl">
                 {/* Header / Brand */}
-                <div className="w-full flex justify-between items-center mb-16">
+                <div className="w-full flex justify-between items-center mb-10">
                    <motion.div 
                      initial={{ opacity: 0, x: -20 }}
                      animate={{ opacity: 1, x: 0 }}
@@ -334,17 +343,17 @@ export default function App() {
                    <LanguageSwitcher />
                 </div>
 
-                <div className="text-center mb-16">
+                <div className="text-center mb-10">
                     <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-6 leading-[0.9] cinema-text-shadow">
                        {t("hero.title")}<span className="text-primary">{t("hero.titleSuffix")}</span>
                     </h2>
-                    <p className="text-white/80 text-sm md:text-lg max-w-sm mx-auto font-medium leading-relaxed mb-10">
+                    <p className="text-zinc-200 text-sm md:text-lg max-w-sm mx-auto font-medium leading-relaxed mb-10 drop-shadow-sm">
                        {t("hero.subtitle")}
                     </p>
 
                     <ShaderButton
                        onClick={() => window.open("https://wa.me/558199130885", "_blank")}
-                       className="w-full text-white font-black text-xl italic uppercase py-8 shadow-[0_20px_50px_rgba(255,40,0,0.3)] mb-4 flex items-center justify-center gap-3"
+                       className="w-full text-white font-black text-xl italic uppercase py-6 shadow-[0_20px_50px_rgba(255,40,0,0.3)] mb-4 flex items-center justify-center gap-3"
                     >
                        <Rocket size={24} fill="currentColor" />
                        {t("hero.cta")}
@@ -354,7 +363,7 @@ export default function App() {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                    {BIO_LINKS.map((link, i) => (
                     <ShaderButton
                       key={i}
@@ -369,7 +378,7 @@ export default function App() {
                       className="w-full group"
                     >
                       <div className={cn(
-                        "flex items-center justify-between p-6 border transition-all duration-500",
+                        "flex items-center justify-between p-4 border transition-all duration-500",
                         link.color.includes("bg-primary")
                           ? "bg-transparent text-white border-transparent"
                           : "bg-black/40 border-white/[0.05] hover:border-primary/20 text-white/40 hover:text-white"
@@ -392,12 +401,12 @@ export default function App() {
 
               {/* Part 3: Portfolio & Skills */}
               <section className="w-full">
-                <div className="flex items-center justify-between mb-12 px-2">
+                <div className="flex items-center justify-between mb-8 px-2">
                     <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">{t("projects.title")}</h3>
                     <div className="h-[1px] flex-1 bg-white/5 mx-8" />
                     <ChevronRight className="text-primary" />
                 </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {PROJECTS.map((project, idx) => (
                       <PricingWrapper 
                         key={idx} 
@@ -412,7 +421,7 @@ export default function App() {
                          <CardPrice className={idx === 0 ? 'text-black/60' : 'text-primary'}>
                            {project.stack}
                          </CardPrice>
-                         <CardParagraph className={idx === 0 ? 'text-black/80' : 'text-white/70'}>
+                         <CardParagraph className={idx === 0 ? 'text-black/80' : 'text-zinc-200 font-medium'}>
                            {project.desc}
                          </CardParagraph>
                       </PricingWrapper>
@@ -422,14 +431,124 @@ export default function App() {
 
                <CTASection />
 
+               {/* Part 4: Growth & Results */}
+               <section className="w-full">
+                  <div className="flex items-center justify-between mb-8 px-2">
+                      <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Exponential Growth 2026</h3>
+                      <div className="h-[1px] flex-1 bg-white/5 mx-8" />
+                      <Rocket className="text-primary" />
+                  </div>
+                  
+                  <PricingWrapper contactHref="#" color="bg-white/[0.03]" className="max-w-none pt-12 pb-6 px-6 md:px-12 bg-black/40 backdrop-blur-xl border-white/5 overflow-hidden">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
+                       <div>
+                          <CardHeading className="text-white mb-2 leading-none">Revenue Growth</CardHeading>
+                          <CardParagraph className="text-white/40 uppercase text-[10px] font-black tracking-[0.2em]">Scale Performance Analysis</CardParagraph>
+                       </div>
+                       <div className="text-right">
+                          <div className="text-4xl md:text-6xl font-black italic text-primary leading-none mb-2">R$ 7.600,00</div>
+                          <div className="text-[10px] font-black uppercase text-white/40 tracking-widest">Current Month Balance</div>
+                       </div>
+                    </div>
+
+                    <div className="w-full h-[300px] md:h-[400px]">
+                      <AreaChart 
+                        data={EARNINGS_DATA} 
+                        xDataKey="date" 
+                        margin={{ top: 20, right: 20, bottom: 40, left: 20 }}
+                        className="w-full h-full"
+                      >
+                        <Grid horizontal />
+                        <Area dataKey="revenue" fill="var(--primary)" fillOpacity={0.2} strokeWidth={4} />
+                        <XAxis />
+                        <YAxis formatValue={(val: number) => `R$ ${val}`} />
+                        <ChartTooltip />
+                      </AreaChart>
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                       {[
+                         { label: "Start", val: "R$ 200" },
+                         { label: "Peak", val: "R$ 7.6k" },
+                         { label: "Growth", val: "3800%" },
+                         { label: "Status", val: "Scalable" }
+                       ].map((stat, i) => (
+                         <div key={i}>
+                           <div className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">{stat.label}</div>
+                           <div className="text-sm font-black italic uppercase text-white">{stat.val}</div>
+                         </div>
+                       ))}
+                    </div>
+                  </PricingWrapper>
+               </section>
+
+               {/* Part 5: Why I'm The Best Developer */}
+               <section className="w-full mt-20">
+                  <div className="flex items-center justify-between mb-8 px-2">
+                      <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Technical Supremacy</h3>
+                      <div className="h-[1px] flex-1 bg-white/5 mx-8" />
+                      <Code2 className="text-primary" />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                     {[
+                       { 
+                         title: "Clean Architecture", 
+                         desc: "Codebase built for extreme scale. Low coupling, high cohesion, and 100% type safety.",
+                         icon: ShieldAlert
+                       },
+                       { 
+                         title: "Performance First", 
+                         desc: "Optimized WebGL, minimal bundle size, and 100/100 Lighthouse scores on all projects.",
+                         icon: Rocket
+                       },
+                       { 
+                         title: "Global Scale", 
+                         desc: "Multi-language systems serving thousands of users monthly with zero downtime.",
+                         icon: Globe
+                       }
+                     ].map((card, i) => (
+                       <div key={i} className="p-8 rounded-[2rem] bg-white/[0.03] border border-white/5 hover:border-primary/20 transition-all duration-500 group">
+                          <card.icon className="w-10 h-10 text-primary mb-6 transition-transform group-hover:scale-110" />
+                          <h4 className="text-lg font-black italic uppercase tracking-tighter mb-4 text-white group-hover:text-primary transition-colors">{card.title}</h4>
+                          <p className="text-sm text-zinc-400 font-medium leading-relaxed">{card.desc}</p>
+                       </div>
+                     ))}
+                  </div>
+
+                  <div className="mt-8 p-12 rounded-[3rem] bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 p-8 opacity-10 transition-transform group-hover:rotate-12">
+                        <Code2 size={200} />
+                     </div>
+                     <div className="relative z-10 max-w-xl">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 mb-6">
+                           <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                           <span className="text-[9px] font-black uppercase tracking-widest text-primary">Master Developer Elite</span>
+                        </div>
+                        <h4 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-6 leading-none">
+                           I transform complex problems into <span className="text-primary">seamless digital weapons.</span>
+                        </h4>
+                        <p className="text-zinc-200 text-sm md:text-base font-medium leading-relaxed mb-8 drop-shadow-sm">
+                           Not just another developer. I am an architect of digital scalability. My systems don't just work—they dominate. From pixel-perfect shaders to bulletproof backend infrastructures, I deliver the "Unfair Advantage" for your business.
+                        </p>
+                        <ShaderButton 
+                          onClick={() => window.open("https://wa.me/558199130885", "_blank")}
+                          className="px-10 py-5 text-white font-black italic uppercase text-sm"
+                        >
+                           Hire The Best
+                        </ShaderButton>
+                     </div>
+                  </div>
+               </section>
+
                 <div className="mt-20 border-y border-white/5 py-12 overflow-hidden relative">
                    <motion.div 
                      animate={{ x: [0, -1000] }}
                      transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-                     className="flex gap-16 whitespace-nowrap items-center w-max"
+                     className="flex gap-10 whitespace-nowrap items-center w-max"
                    >
                       {[...STACK, ...STACK].map((skill, i) => (
-                        <div key={i} className="flex items-center gap-6">
+                        <div key={i} className="flex items-center gap-3">
                            <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_rgba(255,40,0,0.5)]" />
                            <span className="text-3xl font-black italic uppercase tracking-tighter text-white/40 hover:text-white transition-colors cursor-default">
                               {skill}
@@ -439,7 +558,7 @@ export default function App() {
                    </motion.div>
                 </div>
 
-                <section className="w-full mt-32 relative">
+                <section className="w-full mt-20 relative">
                    <LandingPage />
                 </section>
 

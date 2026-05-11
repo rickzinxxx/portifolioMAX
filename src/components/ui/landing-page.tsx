@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"; 
 import { cn } from "@/lib/utils";
+import { ShaderBackground } from "./liquid-metal-vortex";
+import { HandWrittenTitle } from "./hand-writing-text";
 
 // Reusable ScrollGlobe component following shadcn/ui patterns
 interface ScrollGlobeProps {
@@ -139,6 +141,16 @@ export function ScrollGlobe({ sections, globeConfig = defaultGlobeConfig, classN
         }} 
       />
 
+      {/* Liquid Metal Vortex Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none transition-opacity duration-1000"
+           style={{ opacity: scrollProgress > 0.4 ? 0.3 : 0 }}>
+        <ShaderBackground 
+          hue={scrollProgress * 360} 
+          complexity={1.2} 
+          speed={0.8} 
+        />
+      </div>
+
       {/* Progress Bar */}
 
       {/* Enhanced Navigation with auto-hiding labels - Fully Responsive */}
@@ -207,43 +219,53 @@ export function ScrollGlobe({ sections, globeConfig = defaultGlobeConfig, classN
             "opacity-100 translate-y-0"
           )}>
             
-            <h1 className={cn(
-              "font-bold mb-6 sm:mb-8 leading-[1.1] tracking-tight text-white",
-              index === 0 
-                ? "text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl" 
-                : "text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
-            )}>
-              {section.subtitle ? (
-                <div className="space-y-1 sm:space-y-2">
-                  <div className="bg-gradient-to-r from-white to-white/90 bg-clip-text text-transparent italic font-black uppercase text-[1.2em] tracking-tighter">
+            {section.id === 'discovery' ? (
+              <div className="mb-12">
+                <HandWrittenTitle 
+                  title={section.title} 
+                  subtitle={section.subtitle} 
+                  className="max-w-none text-left p-0 mb-4"
+                />
+              </div>
+            ) : (
+              <h1 className={cn(
+                "font-bold mb-6 sm:mb-8 leading-[1.1] tracking-tight text-white",
+                index === 0 
+                  ? "text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl" 
+                  : "text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl"
+              )}>
+                {section.subtitle ? (
+                  <div className="space-y-1 sm:space-y-2">
+                    <div className="bg-gradient-to-r from-white to-white/90 bg-clip-text text-transparent italic font-black uppercase text-[1.2em] tracking-tighter">
+                      {section.title}
+                    </div>
+                    <div className="text-white/40 text-[0.4em] sm:text-[0.45em] font-medium tracking-[0.2em] uppercase">
+                      {section.subtitle}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent uppercase italic font-black tracking-tighter">
                     {section.title}
                   </div>
-                  <div className="text-white/40 text-[0.4em] sm:text-[0.45em] font-medium tracking-[0.2em] uppercase">
-                    {section.subtitle}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent uppercase italic font-black tracking-tighter">
-                  {section.title}
-                </div>
-              )}
-            </h1>
+                )}
+              </h1>
+            )}
             
             <div className={cn(
-              "text-white/60 leading-relaxed mb-8 sm:mb-10 text-base sm:text-lg lg:text-xl font-light",
+              "text-zinc-100 leading-relaxed mb-8 sm:mb-10 text-lg sm:text-xl lg:text-2xl font-medium",
               section.align === 'center' ? "max-w-full mx-auto text-center" : "max-w-full"
             )}>
-              <p className="mb-3 sm:mb-4">{section.description}</p>
+              <p className="mb-3 sm:mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">{section.description}</p>
             </div>
 
             {/* Enhanced Features - Responsive grid */}
             {section.features && (
-              <div className="grid gap-3 sm:gap-4 mb-8 sm:mb-10">
+              <div className="grid gap-3 sm:gap-4 mb-8 sm:mb-10 w-full">
                 {section.features.map((feature, featureIndex) => (
                   <div 
                     key={feature.title}
                     className={cn(
-                      "group p-4 sm:p-5 lg:p-6 rounded-lg sm:rounded-xl border border-white/5 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5",
+                      "group p-4 sm:p-5 lg:p-6 rounded-lg sm:rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5",
                       "hover:border-primary/20 hover:-translate-y-1"
                     )}
                     style={{ animationDelay: `${featureIndex * 0.1}s` }}
@@ -251,8 +273,8 @@ export function ScrollGlobe({ sections, globeConfig = defaultGlobeConfig, classN
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-primary/60 mt-1.5 sm:mt-2 group-hover:bg-primary transition-colors flex-shrink-0" />
                       <div className="flex-1 space-y-1.5 sm:space-y-2 min-w-0">
-                        <h3 className="font-semibold text-white text-base sm:text-lg">{feature.title}</h3>
-                        <p className="text-white/40 leading-relaxed text-sm sm:text-base">{feature.description}</p>
+                        <h3 className="font-bold text-white text-base sm:text-lg uppercase italic tracking-tight">{feature.title}</h3>
+                        <p className="text-zinc-400 leading-relaxed text-sm sm:text-base font-medium">{feature.description}</p>
                       </div>
                     </div>
                   </div>
@@ -301,14 +323,19 @@ export default function LandingPage() {
   const demoSections = [
     {
       id: "hero",
-      badge: "Welcome",
-      title: "Explorar",
-      subtitle: "Meu Mundo Digital",
-      description: "Bem-vindo ao meu lab criativo. Aqui é onde a tecnologia encontra a inovação para criar experiências memoráveis. Navegue para descobrir o que posso fazer pelo seu projeto.",
+      badge: "Master Developer",
+      title: "Elevando",
+      subtitle: "Possibilidades",
+      description: "Utilizo as tecnologias mais modernas do mercado para entregar resultados reais e interfaces que encantam e convertem.",
       align: "left" as const,
+      features: [
+        { title: "Desenvolvimento Fullstack", description: "Aplicações escaláveis de ponta a ponta com as melhores práticas." },
+        { title: "Interfaces Performáticas", description: "Foco total na experiência do usuário e velocidade de carregamento." },
+        { title: "Motion & Design Único", description: "Animações que guiam o usuário e trazem vida ao seu produto." }
+      ],
       actions: [
         { label: "Começar Jornada", variant: "primary" as const, onClick: () => window.open("https://wa.me/558199130885", "_blank") },
-        { label: "Ver Skills", variant: "secondary" as const, onClick: () => document.getElementById('discovery')?.scrollIntoView({ behavior: 'smooth' }) },
+        { label: "Ver Skills", variant: "secondary" as const, onClick: () => document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth' }) },
       ]
     },
     {
