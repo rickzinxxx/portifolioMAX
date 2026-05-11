@@ -106,8 +106,27 @@ const useWebGLShader = (
             y: 1.0 - (e.clientY - rect.top) / rect.height,
         };
     };
+
+    const handleTouchMove = (e: TouchEvent) => {
+        const canvas = canvasRef.current;
+        if (!canvas || e.touches.length === 0) return;
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        mousePos.current = {
+            x: (touch.clientX - rect.left) / rect.width,
+            y: 1.0 - (touch.clientY - rect.top) / rect.height,
+        };
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchstart', handleTouchMove, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+    return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('touchstart', handleTouchMove);
+        window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, [canvasRef]);
 
   useEffect(() => {
