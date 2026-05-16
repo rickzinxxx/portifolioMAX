@@ -9,7 +9,8 @@ interface ShaderProps {
 const useWebGLShader = (
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
   fragmentShader: string,
-  props: ShaderProps
+  props: ShaderProps,
+  isVisible: boolean
 ) => {
   const webglState = useRef<{
     gl: WebGLRenderingContext;
@@ -97,39 +98,6 @@ const useWebGLShader = (
   }, [canvasRef, fragmentShader]);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const rect = canvas.getBoundingClientRect();
-        mousePos.current = {
-            x: (e.clientX - rect.left) / rect.width,
-            y: 1.0 - (e.clientY - rect.top) / rect.height,
-        };
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-        const canvas = canvasRef.current;
-        if (!canvas || e.touches.length === 0) return;
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        mousePos.current = {
-            x: (touch.clientX - rect.left) / rect.width,
-            y: 1.0 - (touch.clientY - rect.top) / rect.height,
-        };
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchstart', handleTouchMove, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-
-    return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('touchstart', handleTouchMove);
-        window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, [canvasRef]);
-
-  useEffect(() => {
     if (!webglState.current) return;
     
     const { gl, uniformLocations } = webglState.current;
@@ -148,10 +116,16 @@ const useWebGLShader = (
     handleResize();
 
     const animate = () => {
-      const time = ((performance.now() - startTime) / 1000.0);
+      if (!isVisible) {
+          animationFrameId = requestAnimationFrame(animate);
+          return;
+      }
+      
+      const now = performance.now();
+      const time = ((now - startTime) / 1000.0);
       
       gl.uniform1f(uniformLocations.iTime, time);
-      gl.uniform2f(uniformLocations.iMouse, mousePos.current.x, mousePos.current.y);
+      gl.uniform2f(uniformLocations.iMouse, 0.5, 0.5);
       gl.uniform1f(uniformLocations.uHue, props.hue);
       gl.uniform1f(uniformLocations.uComplexity, props.complexity);
       gl.uniform1f(uniformLocations.uSpeed, props.speed);
@@ -165,11 +139,24 @@ const useWebGLShader = (
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
     };
-  }, [canvasRef, props]);
+  }, [canvasRef, props, isVisible]);
 };
 
 export const ShaderBackground: React.FC<ShaderProps> = (props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isVisible, setIsVisible] = React.useState(true);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
 
   const fragmentShader = `
     precision highp float;
@@ -277,7 +264,7 @@ export const ShaderBackground: React.FC<ShaderProps> = (props) => {
     }
   `;
 
-  useWebGLShader(canvasRef, fragmentShader, props);
+  useWebGLShader(canvasRef, fragmentShader, props, isVisible);
 
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 };

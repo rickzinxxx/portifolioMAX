@@ -203,7 +203,7 @@ const STAGGER_CONTAINER = {
   }
 };
 
-const LanguageSwitcher = () => {
+const LanguageSwitcher = ({ onSimulateOffline }: { onSimulateOffline: (val: boolean) => void }) => {
   const { i18n } = useTranslation();
 
   return (
@@ -229,7 +229,7 @@ const LanguageSwitcher = () => {
         </DropdownMenuItem>
         <div className="h-[1px] bg-white/10 my-1" />
         <DropdownMenuItem 
-          onClick={() => setIsOffline(true)}
+          onClick={() => onSimulateOffline(true)}
           className="text-red-500 hover:bg-red-500 hover:text-white focus:bg-red-500 focus:text-white cursor-pointer font-bold uppercase text-[10px] tracking-widest flex items-center gap-2"
         >
           <WifiOff className="w-3 h-3" />
@@ -359,22 +359,24 @@ export default function App() {
                 {/* Part 2: Connect & Business */}
                 <section className="w-full max-w-2xl">
                 {/* Header / Brand */}
-                <div className="w-full flex justify-between items-center mb-10">
+                <div className="w-full flex flex-col md:flex-row justify-center md:justify-between items-center mb-10 gap-6">
                    <motion.div 
                      initial={{ opacity: 0, x: -20 }}
                      animate={{ opacity: 1, x: 0 }}
                      whileHover={{ scale: 1.05, filter: "brightness(1.2)" }}
-                     className="text-2xl md:text-3xl font-black italic tracking-tighter uppercase cursor-default group"
+                     className="text-2xl md:text-3xl font-black italic tracking-tighter uppercase cursor-default group flex flex-col items-center md:items-start"
                    >
-                     <span className="text-white group-hover:text-primary transition-colors duration-500">{t("nav.brand")}</span>
-                     <span className="text-primary italic group-hover:text-white transition-colors duration-500">{t("nav.brandSuffix")}</span>
+                     <div>
+                       <span className="text-white group-hover:text-primary transition-colors duration-500">{t("nav.brand")}</span>
+                       <span className="text-primary italic group-hover:text-white transition-colors duration-500">{t("nav.brandSuffix")}</span>
+                     </div>
                      <motion.div 
                        animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.02, 1] }}
                        transition={{ duration: 2, repeat: Infinity }}
                        className="h-1 w-full bg-primary blur-[2px] mt-[-4px]" 
                      />
                    </motion.div>
-                   <LanguageSwitcher />
+                   <LanguageSwitcher onSimulateOffline={setIsOffline} />
                 </div>
 
                 <div className="text-center mb-10">
@@ -386,6 +388,7 @@ export default function App() {
                     </p>
 
                     <ShaderButton
+                       lightMode={isMobile}
                        onClick={() => window.open("https://wa.me/558199130885", "_blank")}
                        className="w-full text-white font-black text-xl italic uppercase py-6 shadow-[0_20px_50px_rgba(255,40,0,0.3)] mb-4 flex items-center justify-center gap-3"
                     >
@@ -401,6 +404,7 @@ export default function App() {
                    {BIO_LINKS.map((link, i) => (
                     <ShaderButton
                       key={i}
+                      lightMode={isMobile}
                       onClick={() => {
                         if (link.link === "#") {
                           setDevTitle(link.title);
@@ -433,12 +437,12 @@ export default function App() {
                 </div>
               </section>
 
-              {/* Part 3: Portfolio & Skills */}
+              {/* Part 3: Portfólio & Habilidades */}
               <section className="w-full">
-                <div className="flex items-center justify-between mb-8 px-2">
-                    <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">{t("projects.title")}</h3>
-                    <div className="h-[1px] flex-1 bg-white/5 mx-8" />
-                    <ChevronRight className="text-primary" />
+                <div className="flex flex-col md:flex-row items-center justify-between mb-8 px-2 gap-4">
+                    <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-center md:text-left">{t("projects.title")}</h3>
+                    <div className="hidden md:block h-[1px] flex-1 bg-white/5 mx-8" />
+                    <ChevronRight className="text-primary animate-pulse" />
                 </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {PROJECTS.map((project, idx) => (
@@ -465,23 +469,23 @@ export default function App() {
 
                <CTASection />
 
-               {/* Part 4: Growth & Results */}
+               {/* Part 4: Crescimento & Resultados */}
                <section className="w-full">
-                  <div className="flex items-center justify-between mb-8 px-2">
-                      <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Exponential Growth 2026</h3>
-                      <div className="h-[1px] flex-1 bg-white/5 mx-8" />
-                      <Rocket className="text-primary" />
+                  <div className="flex flex-col md:flex-row items-center justify-between mb-8 px-2 gap-4">
+                      <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-center md:text-left">Crescimento Exponencial 2026</h3>
+                      <div className="hidden md:block h-[1px] flex-1 bg-white/5 mx-8" />
+                      <Rocket className="text-primary animate-bounce" />
                   </div>
                   
                   <PricingWrapper contactHref="#" color="bg-white/[0.03]" className="max-w-none pt-12 pb-6 px-6 md:px-12 bg-black/40 backdrop-blur-xl border-white/5 overflow-hidden">
-                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 gap-8 text-center md:text-left">
                        <div>
-                          <CardHeading className="text-white mb-2 leading-none">Revenue Growth</CardHeading>
-                          <CardParagraph className="text-white/40 uppercase text-[10px] font-black tracking-[0.2em]">Scale Performance Analysis</CardParagraph>
+                          <CardHeading className="text-white mb-2 leading-none">Crescimento de Receita</CardHeading>
+                          <CardParagraph className="text-white/40 uppercase text-[10px] font-black tracking-[0.2em]">Análise de Desempenho em Escala</CardParagraph>
                        </div>
-                       <div className="text-right">
+                       <div className="md:text-right">
                           <div className="text-4xl md:text-6xl font-black italic text-primary leading-none mb-2">R$ 7.600,00</div>
-                          <div className="text-[10px] font-black uppercase text-white/40 tracking-widest">Current Month Balance</div>
+                          <div className="text-[10px] font-black uppercase text-white/40 tracking-widest">Saldo do Mês Atual</div>
                        </div>
                     </div>
 
@@ -502,10 +506,10 @@ export default function App() {
 
                     <div className="mt-8 pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                        {[
-                         { label: "Start", val: "R$ 200" },
-                         { label: "Peak", val: "R$ 7.6k" },
-                         { label: "Growth", val: "3800%" },
-                         { label: "Status", val: "Scalable" }
+                         { label: "Início", val: "R$ 200" },
+                         { label: "Pico", val: "R$ 7.6k" },
+                         { label: "Crescimento", val: "3800%" },
+                         { label: "Status", val: "Escalável" }
                        ].map((stat, i) => (
                          <div key={i}>
                            <div className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">{stat.label}</div>
@@ -516,60 +520,60 @@ export default function App() {
                   </PricingWrapper>
                </section>
 
-               {/* Part 5: Why I'm The Best Developer */}
+               {/* Part 5: Por que sou o melhor desenvolvedor */}
                <section className="w-full mt-20">
-                  <div className="flex items-center justify-between mb-8 px-2">
-                      <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Technical Supremacy</h3>
-                      <div className="h-[1px] flex-1 bg-white/5 mx-8" />
+                  <div className="flex flex-col md:flex-row items-center justify-between mb-8 px-2 gap-4">
+                      <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-center md:text-left">Supremacia Técnica</h3>
+                      <div className="hidden md:block h-[1px] flex-1 bg-white/5 mx-8" />
                       <Code2 className="text-primary" />
                   </div>
-
+ 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                      {[
                        { 
-                         title: "Clean Architecture", 
-                         desc: "Codebase built for extreme scale. Low coupling, high cohesion, and 100% type safety.",
+                         title: "Arquitetura Limpa", 
+                         desc: "Codebase construído para escala extrema. Baixo acoplamento, alta coesão e 100% de segurança de tipos.",
                          icon: ShieldAlert
                        },
                        { 
-                         title: "Performance First", 
-                         desc: "Optimized WebGL, minimal bundle size, and 100/100 Lighthouse scores on all projects.",
+                         title: "Performance Primeiro", 
+                         desc: "WebGL otimizado, tamanho mínimo de bundle e pontuações 100/100 no Lighthouse em todos os projetos.",
                          icon: Rocket
                        },
                        { 
-                         title: "Global Scale", 
-                         desc: "Multi-language systems serving thousands of users monthly with zero downtime.",
+                         title: "Escala Global", 
+                         desc: "Sistemas multilíngues atendendo milhares de usuários mensalmente com tempo de inatividade zero.",
                          icon: Globe
                        }
                      ].map((card, i) => (
-                       <div key={i} className="p-8 rounded-[2rem] bg-white/[0.03] border border-white/5 hover:border-primary/20 transition-all duration-500 group">
+                       <div key={i} className="p-8 rounded-[2rem] bg-white/[0.03] border border-white/5 hover:border-primary/20 transition-all duration-500 group text-center md:text-left flex flex-col items-center md:items-start">
                           <card.icon className="w-10 h-10 text-primary mb-6 transition-transform group-hover:scale-110" />
                           <h4 className="text-lg font-black italic uppercase tracking-tighter mb-4 text-white group-hover:text-primary transition-colors">{card.title}</h4>
                           <p className="text-sm text-zinc-400 font-medium leading-relaxed">{card.desc}</p>
                        </div>
                      ))}
                   </div>
-
-                  <div className="mt-8 p-12 rounded-[3rem] bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 relative overflow-hidden group">
+ 
+                  <div className="mt-8 p-12 rounded-[3rem] bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 relative overflow-hidden group flex flex-col items-center md:items-start text-center md:text-left">
                      <div className="absolute top-0 right-0 p-8 opacity-10 transition-transform group-hover:rotate-12">
                         <Code2 size={200} />
                      </div>
-                     <div className="relative z-10 max-w-xl">
+                     <div className="relative z-10 max-w-xl flex flex-col items-center md:items-start">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 mb-6">
                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                            <span className="text-[9px] font-black uppercase tracking-widest text-primary">Master Developer Elite</span>
                         </div>
                         <h4 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-6 leading-none">
-                           I transform complex problems into <span className="text-primary">seamless digital weapons.</span>
+                           Eu transformo problemas complexos em <span className="text-primary">armas digitais perfeitas.</span>
                         </h4>
                         <p className="text-zinc-200 text-sm md:text-base font-medium leading-relaxed mb-8 drop-shadow-sm">
-                           Not just another developer. I am an architect of digital scalability. My systems don't just work—they dominate. From pixel-perfect shaders to bulletproof backend infrastructures, I deliver the "Unfair Advantage" for your business.
+                           Não sou apenas mais um desenvolvedor. Sou um arquiteto de escalabilidade digital. Meus sistemas não apenas funcionam — eles dominam. De shaders pixel-perfect a infraestruturas de backend blindadas, entrego a "Vantagem Desleal" para o seu negócio.
                         </p>
                         <ShaderButton 
                           onClick={() => window.open("https://wa.me/558199130885", "_blank")}
                           className="px-10 py-5 text-white font-black italic uppercase text-sm"
                         >
-                           Hire The Best
+                           Contrate O Melhor
                         </ShaderButton>
                      </div>
                   </div>

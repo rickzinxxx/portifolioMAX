@@ -6,21 +6,50 @@ import React from "react"
 interface ShaderButtonProps extends HTMLMotionProps<"button"> {
   children: React.ReactNode
   shaderClassName?: string
+  lightMode?: boolean
 }
 
 export const ShaderButton = React.forwardRef<HTMLButtonElement, ShaderButtonProps>(
-  ({ children, className, shaderClassName, ...props }, ref) => {
+  ({ children, className, shaderClassName, lightMode = false, ...props }, ref) => {
+    const [isHovered, setIsHovered] = React.useState(false);
+
     return (
       <motion.button
         ref={ref}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        whileTap={{ scale: 0.95 }}
+        animate={isHovered ? {
+          scale: [1, 1.02, 1],
+          boxShadow: [
+            "0 0 0px rgba(255, 0, 0, 0)",
+            "0 0 20px rgba(255, 0, 0, 0.3)",
+            "0 0 0px rgba(255, 0, 0, 0)"
+          ]
+        } : { 
+          scale: 1,
+          boxShadow: "0 0 0px rgba(255, 0, 0, 0)"
+        }}
+        transition={isHovered ? {
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        } : {
+          duration: 0.3
+        }}
         className={cn(
           "relative overflow-hidden group rounded-[2rem] transition-all duration-300",
           className
         )}
         {...props}
       >
+        {/* Click Flash effect */}
+        <motion.div 
+          className="absolute inset-0 z-20 bg-white opacity-0"
+          initial={false}
+          whileTap={{ opacity: [0, 0.2, 0], transition: { duration: 0.3 } }}
+        />
+
         {/* Shader Background */}
         <div className={cn("absolute inset-0 z-0 opacity-80 group-hover:opacity-100 transition-opacity", shaderClassName)}>
           <Warp
@@ -34,7 +63,8 @@ export const ShaderButton = React.forwardRef<HTMLButtonElement, ShaderButtonProp
             shapeScale={0.08}
             scale={1.5}
             rotation={0}
-            speed={1.2}
+            speed={isHovered ? 2.5 : (lightMode ? 0.3 : 1.2)}
+            complexity={lightMode ? 0.04 : 0.08}
             colors={["#FF0000", "#CC0000", "#FF4444", "#000000"]}
           />
         </div>

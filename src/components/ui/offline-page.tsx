@@ -25,11 +25,11 @@ export function OfflinePage() {
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#ff3333_0%,transparent_50%)] blur-[120px]" />
             </div>
 
-            <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+            <div className="relative z-10 w-full max-w-5xl flex flex-col items-center py-8">
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 flex items-center gap-3 bg-zinc-900/50 px-4 py-2 rounded-full border border-white/5 backdrop-blur-md"
+                    className="mb-4 sm:mb-8 flex items-center gap-3 bg-zinc-900/50 px-4 py-2 rounded-full border border-white/5 backdrop-blur-md"
                 >
                     <WifiOff className="w-4 h-4 text-primary" />
                     <span className="text-xs font-black italic uppercase tracking-widest text-white/60">
@@ -37,7 +37,7 @@ export function OfflinePage() {
                     </span>
                 </motion.div>
 
-                <div className="mb-0 overflow-hidden w-full flex justify-center">
+                <div className="mb-4 sm:mb-8 overflow-hidden w-full flex justify-center scale-75 sm:scale-100 origin-center">
                     <Glitchy404 color="#ff3333" width={600} height={180} />
                 </div>
 
@@ -45,7 +45,7 @@ export function OfflinePage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="w-full max-w-md"
+                    className="w-full max-w-md scale-[0.8] sm:scale-100 origin-top"
                 >
                     <PacmanGame />
                 </motion.div>
@@ -54,7 +54,7 @@ export function OfflinePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
-                    className="mt-12 flex flex-col sm:flex-row gap-4 items-center"
+                    className="mt-6 sm:mt-12 flex flex-col sm:flex-row gap-4 items-center"
                 >
                     <ShaderButton 
                         onClick={handleRetry}

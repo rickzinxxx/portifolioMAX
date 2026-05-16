@@ -57,8 +57,8 @@
     "vite": "^6.2.0"
   },
   "overrides": {
-    "react": "$react",
-    "react-dom": "$react-dom"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
