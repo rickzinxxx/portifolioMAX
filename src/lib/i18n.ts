@@ -33,7 +33,11 @@ const resources = {
         close: "Fechar [ESC]"
       },
       projects: {
-        title: "Projetos Techify"
+        title: "Projetos Techify",
+        featured: "Destaque do Mês",
+        others: "Outros Projetos",
+        spatialTitle: "Spatial Experience v1",
+        spatialSubtitle: "O ápice da interatividade"
       }
     }
   },
@@ -67,7 +71,11 @@ const resources = {
         close: "Close [ESC]"
       },
       projects: {
-        title: "Techify Projects"
+        title: "Techify Projects",
+        featured: "Featured of the Month",
+        others: "Other Projects",
+        spatialTitle: "Spatial Experience v1",
+        spatialSubtitle: "The pinnacle of interactivity"
       }
     }
   }

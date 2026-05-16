@@ -22,7 +22,7 @@ export function CTASection() {
               <Dithering
                 colorBack="#00000000" // Transparent
                 colorFront="#FF0000"  // Accent (Red)
-                shape="warp"
+                shape="simplex"
                 type="4x4"
                 speed={isHovered ? 0.6 : 0.2}
                 className="size-full"

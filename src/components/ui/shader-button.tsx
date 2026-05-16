@@ -64,7 +64,6 @@ export const ShaderButton = React.forwardRef<HTMLButtonElement, ShaderButtonProp
             scale={1.5}
             rotation={0}
             speed={isHovered ? 2.5 : (lightMode ? 0.3 : 1.2)}
-            complexity={lightMode ? 0.04 : 0.08}
             colors={["#FF0000", "#CC0000", "#FF4444", "#000000"]}
           />
         </div>

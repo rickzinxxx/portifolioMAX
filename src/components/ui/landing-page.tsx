@@ -128,7 +128,7 @@ export function ScrollGlobe({ sections, globeConfig = defaultGlobeConfig, classN
     <div 
       ref={containerRef}
       className={cn(
-        "relative w-full max-w-screen overflow-x-hidden min-h-screen bg-black text-foreground",
+        "relative w-full max-w-screen overflow-x-hidden min-h-screen bg-transparent text-foreground",
         className
       )}
     >
@@ -141,15 +141,7 @@ export function ScrollGlobe({ sections, globeConfig = defaultGlobeConfig, classN
         }} 
       />
 
-      {/* Liquid Metal Vortex Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none transition-opacity duration-1000"
-           style={{ opacity: scrollProgress > 0.4 ? 0.3 : 0 }}>
-        <ShaderBackground 
-          hue={scrollProgress * 360} 
-          complexity={1.2} 
-          speed={0.8} 
-        />
-      </div>
+      {/* Liquid Metal Vortex Background removed as requested */}
 
       {/* Progress Bar */}
 

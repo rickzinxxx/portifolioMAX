@@ -33,22 +33,46 @@ const Cross = () => (
   </svg>
 )
 
+export const pricingVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15
+    }
+  }
+}
+
 export const PricingWrapper: React.FC<{
   children: React.ReactNode
   type?: 'waves' | 'crosses'
   contactHref: string
   className?: string
   color?: string
-}> = ({ children, contactHref, className, type = 'waves', color = 'bg-primary' }) => (
+  image?: string
+}> = ({ children, contactHref, className, type = 'waves', color = 'bg-primary', image }) => (
   <article
     className={cn(
-      'min-h-[400px] h-full max-w-sm w-full relative overflow-hidden rounded-[2.5rem] text-white p-6 group transition-all duration-500 border border-white/5 hover:border-white/10',
+      'min-h-[450px] h-full max-w-sm w-full relative overflow-hidden rounded-[2.5rem] text-white p-6 group transition-all duration-500 border border-white/5 hover:border-white/10',
       color,
       className
     )}
   >
     <div className="relative z-10 h-full flex flex-col justify-between">
       <div className="space-y-6">
+        {image && (
+          <div className="relative w-full aspect-[16/10] overflow-hidden rounded-2xl mb-4 border border-white/10">
+            <img 
+              src={image} 
+              alt="Project preview" 
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        )}
         {children}
       </div>
       

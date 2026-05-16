@@ -107,63 +107,35 @@ const fragmentShader = `
     vec2 st = (uv - 0.5) * 2.0;
     st.x *= u_resolution.x / u_resolution.y;
     
-    float time = u_time * 0.25; 
+    float time = u_time * 0.15; 
     
-    vec2 curlForce = curl(st * 1.5, time * 0.5) * (u_isMobile ? 0.3 : 0.6);
-    vec2 flowField = st + curlForce;
+    // Clean flow instead of curl
+    vec2 flowField = st;
     
-    float dist1 = fbm(flowField * 1.5 + time * 0.8, u_isMobile ? 2 : 8) * 0.4;
-    float dist2 = fbm(flowField * 2.3 - time * 0.6, u_isMobile ? 1 : 6) * 0.3;
-    float dist3 = u_isMobile ? 0.0 : fbm(flowField * 3.1 + time * 1.2, 4) * 0.2;
-    float dist4 = u_isMobile ? 0.0 : fbm(flowField * 4.7 - time * 0.9, 3) * 0.15;
+    float n1 = fbm(flowField * 1.0 + time * 0.2, u_isMobile ? 2 : 4) * 0.5;
+    float n2 = fbm(flowField * 1.5 - time * 0.1, u_isMobile ? 1 : 3) * 0.3;
     
-    float cells = voronoi(flowField * (u_isMobile ? 1.2 : 2.5) + time * 0.4);
-    cells = smoothstep(0.1, 0.7, cells);
+    float cells = voronoi(flowField * 1.5 + time * 0.1);
+    cells = smoothstep(0.2, 0.8, cells);
     
-    float plasmaEffect = plasma(flowField + vec2(dist1, dist2), time * 1.5) * 0.2;
-    float totalDist = dist1 + dist2 + dist3 + dist4 + plasmaEffect;
+    float totalDist = n1 + n2;
     
-    float streak1 = sin((st.x + totalDist) * 15.0 + time * 3.0) * 0.5 + 0.5;
-    float streak2 = u_isMobile ? 0.0 : sin((st.x + totalDist * 0.7) * 25.0 - time * 2.0) * 0.5 + 0.5;
-    float streak3 = u_isMobile ? 0.0 : sin((st.x + totalDist * 1.3) * 35.0 + time * 4.0) * 0.5 + 0.5;
+    // Streaks that follow a more linear pattern
+    float streak = sin((st.y + totalDist * 0.1) * 8.0 + time) * 0.5 + 0.5;
+    streak = smoothstep(0.4, 0.6, streak);
     
-    streak1 = smoothstep(0.3, 0.7, streak1);
-    if (!u_isMobile) {
-      streak2 = smoothstep(0.2, 0.8, streak2);
-      streak3 = smoothstep(0.4, 0.6, streak3);
-    }
+    vec3 color1 = vec3(0.8, 0.05, 0.0);   // Primary Red
+    vec3 color2 = vec3(0.1, 0.0, 0.0);   // Very Dark Red
     
-    float combinedStreaks = streak1 * 0.6 + streak2 * 0.4 + streak3 * 0.5;
+    float gradient = uv.y;
+    vec3 finalColor = mix(color2, color1, gradient * (0.3 + streak * 0.7));
     
-    float shape1 = 1.0 - abs(st.x + totalDist * 0.6);
-    shape1 = smoothstep(0.0, 1.0, shape1);
-    
-    vec3 color1 = vec3(1.0, 0.05, 0.0);   // Primary Red
-    vec3 color2 = vec3(0.5, 0.0, 0.1);   // Dark Red
-    
-    float gradient = 1.0 - uv.y;
-    float colorNoise = fbm(flowField * 3.0 + time * 0.5, 4) * 0.5 + 0.5;
-    
-    vec3 finalColor = mix(color2, color1, gradient);
-    finalColor = mix(finalColor, color1, colorNoise * 0.5);
-    
-    float intensity = shape1 * combinedStreaks;
-    intensity *= (1.0 + cells * 0.2);
-    intensity *= u_intensity;
-    
-    vec2 mouse = u_mouse / u_resolution.xy;
-    mouse = (mouse - 0.5) * 2.0;
-    mouse.x *= u_resolution.x / u_resolution.y;
-    
-    float mouseInfluence = 1.0 - length(st - mouse) * 0.6;
-    mouseInfluence = smoothstep(0.0, 1.0, max(0.0, mouseInfluence));
-    
-    intensity += mouseInfluence * 0.4;
+    float intensity = (0.5 + cells * 0.5) * u_intensity;
     
     vec3 result = finalColor * intensity;
-    result = pow(result, vec3(0.85));
+    result = pow(result, vec3(1.1)); // Slightly more contrast
     
-    float vignette = smoothstep(0.2, 1.0, 1.0 - length(uv - 0.5) * 0.85);
+    float vignette = smoothstep(0.0, 1.2, 1.0 - length(uv - 0.5) * 1.1);
     result *= vignette;
     
     gl_FragColor = vec4(result, 1.0);
@@ -321,25 +293,7 @@ export default function WebGLHero({ onEnter }: { onEnter: () => void }) {
     const cleanupResize = initGL()
     
     const handleMouseMove = (e: MouseEvent) => {
-      const canvas = canvasRef.current
-      if (!canvas) return
-      const rect = canvas.getBoundingClientRect()
-      mouseRef.current.x = (e.clientX - rect.left) * window.devicePixelRatio
-      mouseRef.current.y = (rect.height - (e.clientY - rect.top)) * window.devicePixelRatio
-
-      gsap.to({ intensity: globalIntensity }, {
-        intensity: 1.2,
-        duration: 0.3,
-        ease: "power2.out",
-        onUpdate: function() { setGlobalIntensity(this.targets()[0].intensity) }
-      })
-      gsap.to({ intensity: 1.2 }, {
-        intensity: 1.0,
-        duration: 1.2,
-        delay: 0.1,
-        ease: "power2.out",
-        onUpdate: function() { setGlobalIntensity(this.targets()[0].intensity) }
-      })
+      // Disabled mouse interaction as per request
     }
     window.addEventListener("mousemove", handleMouseMove)
 
