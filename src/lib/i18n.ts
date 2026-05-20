@@ -16,15 +16,21 @@ const resources = {
         ]
       },
       nav: {
-        brand: "MARCOS",
-        brandSuffix: " Henrique",
-        language: "Idioma"
+        brand: "RICKZINXX",
+        brandSuffix: "",
+        language: "Idioma",
+        inicio: "Início",
+        projetos: "Projetos",
+        global: "Global",
+        sobre: "Sobre Mim",
+        experiencia: "Experiência",
+        contato: "Contato"
       },
       hero: {
-        title: "Engenharia de",
-        titleSuffix: " Software",
-        subtitle: "Elevando marcas através de tecnologias 3D e interfaces de alto impacto com a Techify.",
-        cta: "🚀 Iniciar um Projeto",
+        title: "Olá, eu sou ",
+        titleSuffix: "Rickzinxx",
+        subtitle: "Transformando designs em experiências web interativas e responsivas. Especializado em criar interfaces modernas com as melhores tecnologias frontend.",
+        cta: "🚀 Ver Projetos",
         subtext: "Consultoria Técnica & Desenvolvimento Premium"
       },
       dev: {
@@ -54,15 +60,21 @@ const resources = {
         ]
       },
       nav: {
-        brand: "MARCOS",
-        brandSuffix: " Henrique",
-        language: "Language"
+        brand: "RICKZINXX",
+        brandSuffix: "",
+        language: "Language",
+        inicio: "Home",
+        projetos: "Projects",
+        global: "Global",
+        sobre: "About Me",
+        experiencia: "Experience",
+        contato: "Contact"
       },
       hero: {
-        title: "Software",
-        titleSuffix: " Engineering",
-        subtitle: "Elevating brands through 3D technologies and high-impact interfaces with Techify.",
-        cta: "🚀 Start a Project",
+        title: "Hello, I am ",
+        titleSuffix: "Rickzinxx",
+        subtitle: "Transforming designs into interactive, responsive web experiences. Specializing in creating modern interfaces using the best frontend technologies.",
+        cta: "🚀 View Projects",
         subtext: "Technical Consulting & Premium Development"
       },
       dev: {

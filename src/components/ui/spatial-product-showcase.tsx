@@ -55,8 +55,8 @@ const PRODUCT_DATA: Record<ProductId, ProductData> = {
     label: 'Audio',
     title: 'Spatial Anchor',
     description: 'The primary node for binaural synchronization. Handles low-latency transmission and anchors the spatial audio soundstage.',
-    // Updated with reliable Unsplash URL
-    image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=1000&auto=format&fit=crop',
+    // Updated with high-quality isolated earbud image (AirPods Pro style)
+    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?q=80&w=1000&auto=format&fit=crop',
     colors: {
       gradient: 'from-blue-900/40 to-black',
       glow: 'bg-blue-500',
@@ -75,8 +75,8 @@ const PRODUCT_DATA: Record<ProductId, ProductData> = {
     label: 'Voice',
     title: 'Vocal Clarity',
     description: 'Optimized for high-frequency detail and voice pickup. Contains the beamforming microphone array for crystal clear calls.',
-    // Updated with reliable Unsplash URL
-    image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=1000&auto=format&fit=crop',
+    // Updated with high-quality isolated right earbud image (AirPods Pro style)
+    image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1000&auto=format&fit=crop',
     colors: {
       gradient: 'from-red-900/40 to-black',
       glow: 'bg-primary',

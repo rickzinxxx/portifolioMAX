@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { cn } from "@/lib/utils";
 import { ShaderBackground } from "./liquid-metal-vortex";
 import { HandWrittenTitle } from "./hand-writing-text";
+import LightningText from "./lightning-text";
 
 // Reusable ScrollGlobe component following shadcn/ui patterns
 interface ScrollGlobeProps {
@@ -218,6 +219,24 @@ export function ScrollGlobe({ sections, globeConfig = defaultGlobeConfig, classN
                   subtitle={section.subtitle} 
                   className="max-w-none text-left p-0 mb-4"
                 />
+              </div>
+            ) : section.id === 'future' ? (
+              <div className="w-full flex flex-col items-center justify-center mb-8">
+                <div className="w-full max-w-3xl">
+                  <LightningText 
+                    text="NOSSO AMANHÃ" 
+                    textColor="#ff4c2b"
+                    thunderColor="#ffffff"
+                    thunderGlow="#ff2800"
+                    sparkColor="#ff4c2b"
+                    size={64}
+                    height={180}
+                    className="border border-[#ff2800]/20 bg-[#050202]"
+                  />
+                </div>
+                <div className="mt-5 text-white/50 text-xs sm:text-sm md:text-base font-black tracking-[0.3em] uppercase select-none">
+                  {section.subtitle}
+                </div>
               </div>
             ) : (
               <h1 className={cn(

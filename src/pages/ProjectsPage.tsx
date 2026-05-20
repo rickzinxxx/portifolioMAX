@@ -2,12 +2,32 @@ import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { ChevronRight, ArrowLeft, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-import EarbudShowcase from "../components/ui/spatial-product-showcase";
-import { PricingWrapper, Heading as CardHeading, Price as CardPrice, Paragraph as CardParagraph } from "../components/ui/animated-pricing-cards";
+import { PricingWrapper, Heading as CardHeading, Paragraph as CardParagraph, Price as CardPrice } from "../components/ui/animated-pricing-cards";
 import { CTASection } from "../components/ui/hero-dithering-card";
 import { cn } from "@/lib/utils";
 
 const PROJECTS = [
+  {
+    title: "Senac Reciclagem",
+    desc: "Uma plataforma educacional dedicada à conscientização ambiental, oferecendo informações detalhadas sobre o descarte correto de lixo e dicas sustentáveis com foco em Pernambuco.",
+    stack: "HTML + CSS + JS",
+    link: "https://senac-reciclagem-v1.netlify.app",
+    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2070&auto=format&fit=crop"
+  },
+  {
+    title: "Neon Tic-Tac-Toe Diamond",
+    desc: "Jogo da velha com tema neon desenvolvido para diversão e passatempo. Interface luminosa e visual elegante.",
+    stack: "HTML + CSS + JS",
+    link: "https://neon-tic-tac-teo.netlify.app/",
+    image: "https://images.unsplash.com/photo-1611195974226-a6a9be9dd763?q=80&w=2070&auto=format&fit=crop"
+  },
+  {
+    title: "Techify Max",
+    desc: "Sistema avançado de automação e escala digital de alto padrão.",
+    stack: "React + GSAP",
+    link: "https://splendid-unicorn-68fd5c.netlify.app",
+    image: "https://images.unsplash.com/photo-1551288049-bbdac8a28a1e?q=80&w=2070&auto=format&fit=crop"
+  },
   {
     title: "Techify Office",
     desc: "Plataforma de gestão e inteligência corporativa da Techify.",
@@ -16,11 +36,18 @@ const PROJECTS = [
     image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop"
   },
   {
-    title: "Techify Max",
-    desc: "Sistema avançado de automação e escala digital.",
-    stack: "React + GSAP",
-    link: "https://techify-max.vercel.app",
-    image: "https://images.unsplash.com/photo-1551288049-bbdac8a28a1e?q=80&w=2070&auto=format&fit=crop"
+    title: "Quantum Flow",
+    desc: "Engine de animação 3D para interfaces de alto desempenho.",
+    stack: "Three.js + Shaders",
+    link: "#",
+    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop"
+  },
+  {
+    title: "Elite Commerce",
+    desc: "E-commerce headless com foco em performance extrema.",
+    stack: "SolidJS + Node",
+    link: "#",
+    image: "https://images.unsplash.com/photo-1557821552-17105176677c?q=80&w=2070&auto=format&fit=crop"
   }
 ];
 
@@ -44,25 +71,7 @@ export default function ProjectsPage() {
             <ChevronRight className="text-primary animate-pulse" />
         </div>
 
-        <div className="mb-24">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 mb-6 font-black italic">
-               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-               <span className="text-[10px] uppercase tracking-widest text-primary">{t("projects.featured")}</span>
-            </div>
-            <h4 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-white mb-3 cinema-text-shadow">{t("projects.spatialTitle")}</h4>
-            <p className="text-zinc-500 text-xs md:text-sm font-medium uppercase tracking-[0.2em]">{t("projects.spatialSubtitle")}</p>
-          </div>
-          <EarbudShowcase />
-        </div>
-
-        <div className="flex items-center gap-4 mb-12 px-2">
-            <div className="h-[1px] flex-1 bg-white/5" />
-            <h4 className="text-[10px] font-black italic uppercase tracking-[0.3em] text-white/20 whitespace-nowrap">{t("projects.others")}</h4>
-            <div className="h-[1px] flex-1 bg-white/5" />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PROJECTS.map((project, idx) => (
               <PricingWrapper 
                 key={idx} 
