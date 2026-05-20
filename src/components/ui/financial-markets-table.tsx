@@ -334,8 +334,107 @@ export function FinancialTable({
 
   return (
     <div className={`w-full max-w-7xl mx-auto ${className}`}>
-      {/* Table Container with horizontal scroll */}
-      <div className="bg-black/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-2xl">
+      {/* Mobile view -- Card list (only visible on mobile screens) */}
+      <div className="md:hidden flex flex-col gap-4">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col gap-4"
+        >
+          {indices.map((index, indexNum) => {
+            const { bgColor, borderColor, textColor } = getPerformanceColor(index.monthlyChangePercent);
+            const ytdStyle = getPerformanceColor(index.growthYtd);
+            return (
+              <motion.div
+                key={index.id}
+                variants={rowVariants}
+                onClick={() => handleIndexSelect(index.id)}
+                className={`p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden cursor-pointer ${
+                  selectedIndex === index.id
+                    ? "bg-primary/5 border-primary/40 ring-1 ring-primary/20"
+                    : "bg-black/40 border-white/5 active:bg-white/[0.02]"
+                }`}
+              >
+                {/* Background light gradient glow for active card */}
+                {selectedIndex === index.id && (
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-xl rounded-full pointer-events-none" />
+                )}
+
+                {/* Card Header: Flag & Name */}
+                <div className="flex items-start justify-between gap-2 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10 flex items-center justify-center bg-zinc-900 shrink-0">
+                      <div className="w-full h-full flex items-center justify-center scale-90">
+                        {getCountryFlag(index.countryCode)}
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-white text-xs tracking-wider uppercase truncate max-w-[170px]">
+                        {index.name}
+                      </h5>
+                      <p className="text-[9px] font-black text-white/30 tracking-widest uppercase">
+                        {index.country}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* YTD Growth badge */}
+                  <div className={`px-2 py-0.5 rounded-md text-[9px] font-black font-mono border ${ytdStyle.bgColor} ${ytdStyle.borderColor} ${ytdStyle.textColor}`}>
+                    YTD {formatPercentage(index.growthYtd)}
+                  </div>
+                </div>
+
+                {/* Card Body: Principal values */}
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/5">
+                  <div>
+                    <span className="text-[8px] font-black text-white/40 uppercase tracking-widest block mb-0.5">Mensal (MRR)</span>
+                    <span className="font-black text-white text-sm font-mono block">
+                      {formatCurrency(index.monthlyRevenue)}
+                    </span>
+                  </div>
+                  
+                  <div className="text-right">
+                    <span className="text-[8px] font-black text-white/40 uppercase tracking-widest block mb-0.5">Variação Mensal</span>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span className={`font-bold text-xs font-mono ${getPerformanceColor(index.monthlyChange).textColor}`}>
+                        {index.monthlyChange >= 0 ? "+" : ""}{formatCurrency(index.monthlyChange)}
+                      </span>
+                      <span className={`px-1 py-0.5 rounded text-[8px] font-black font-mono border ${bgColor} ${borderColor} ${textColor}`}>
+                        {formatPercentage(index.monthlyChangePercent)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Secondary details row */}
+                <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/5">
+                  <div>
+                    <span className="text-[8px] font-bold text-white/30 uppercase tracking-widest block">Projetos</span>
+                    <span className="font-black text-white/90 text-xs font-mono">{index.activeProjects}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] font-bold text-white/30 uppercase tracking-widest block">Satisfação</span>
+                    <span className="font-black text-primary text-xs font-mono">{index.clientSatisfaction.toFixed(1)}%</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[8px] font-bold text-white/30 uppercase tracking-widest block">Decorrente</span>
+                    <span className="font-bold text-white/80 text-xs font-mono">{formatLargeNumber(index.totalBilling, "M")}</span>
+                  </div>
+                </div>
+
+                {/* Sparkline overlay/bottom indicator for a cool background trace vibe */}
+                <div className="absolute right-4 top-5 opacity-40">
+                  {renderSparkline(index.chartData)}
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+
+      {/* Desktop view -- Table Container with horizontal scroll (hidden on mobile) */}
+      <div className="hidden md:block bg-black/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-2xl">
         <div className="overflow-x-auto no-scrollbar">
           <div className="min-w-[1050px]">
             {/* Table Headers */}
