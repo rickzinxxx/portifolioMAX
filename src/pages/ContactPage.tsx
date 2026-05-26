@@ -38,18 +38,10 @@ export default function ContactPage() {
       href: "https://wa.me/5581999130885",
       icon: Phone,
       desc: "Contato instantâneo"
-    },
-    {
-      title: "GitHub",
-      value: "rickzinxxx",
-      href: "https://github.com/rickzinxxx",
-      icon: Github,
-      desc: "Confira meus repositórios"
     }
   ];
 
   const socialLinks = [
-    { icon: Github, href: "https://github.com/rickzinxxx" },
     { icon: Instagram, href: "https://www.instagram.com/rickzinxx_/" },
     { icon: Linkedin, href: "https://www.linkedin.com/in/seu-linkedin" }
   ];

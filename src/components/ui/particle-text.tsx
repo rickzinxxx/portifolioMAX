@@ -368,8 +368,9 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
 
     particlesRef.current = [];
 
-    // Responsive font size
-    const calculatedFontSize = fontSize || Math.min(100, window.innerWidth / 8);
+    // Responsive font size: larger and more prominent on mobile
+    const isMobileDevice = window.innerWidth < 768;
+    const calculatedFontSize = fontSize || (isMobileDevice ? Math.max(55, Math.min(85, window.innerWidth / 5.5)) : Math.min(100, window.innerWidth / 8));
     ctx.font = `italic 900 ${calculatedFontSize}px ${fontFamily}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -396,7 +397,8 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
     const data = imageData.data;
 
-    const step = Math.min(3, Math.max(2, Math.floor(textWidth / 300))); // Optimized sampling step Dynamic
+    // Use step = 4 on mobile to prevent dense over-crowding, 2 on desktop
+    const step = isMobileDevice ? 4 : 2;
     for (let y = 0; y < tempCanvas.height; y += step) {
       for (let x = 0; x < tempCanvas.width; x += step) {
         const index = (y * tempCanvas.width + x) * 4;
@@ -407,15 +409,15 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
           const particleY = startY + y - tempCanvas.height / 2;
           
           particlesRef.current.push({
-            x: particleX + (Math.random() - 0.5) * 80,
-            y: particleY + (Math.random() - 0.5) * 80,
+            x: particleX + (Math.random() - 0.5) * (isMobileDevice ? 30 : 80),
+            y: particleY + (Math.random() - 0.5) * (isMobileDevice ? 30 : 80),
             targetX: particleX,
             targetY: particleY,
             originalX: particleX,
             originalY: particleY,
             vx: 0,
             vy: 0,
-            size: particleSize + Math.random() * 2,
+            size: particleSize + Math.random() * 1.5,
             opacity: Math.random() * 0.4 + 0.6,
             life: 1
           });
@@ -526,10 +528,14 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     const sizes = new Float32Array(particles.length);
     const opacities = new Float32Array(particles.length);
 
+    const isMobileDevice = window.innerWidth < 768;
+    const calculatedFontSize = fontSize || (isMobileDevice ? Math.max(55, Math.min(85, window.innerWidth / 5.5)) : Math.min(100, window.innerWidth / 8));
+    const sizeScaleFactor = calculatedFontSize / 100;
+
     for (let i = 0; i < particles.length; i++) {
       positions[i * 2] = particles[i].x;
       positions[i * 2 + 1] = particles[i].y;
-      sizes[i] = particles[i].size * 5 * dpr; // Enhanced size for better visibility
+      sizes[i] = particles[i].size * 4 * sizeScaleFactor * dpr; // Scaled nicely to avoid bloated blobs
       opacities[i] = particles[i].opacity;
     }
 
@@ -667,6 +673,29 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     }
   }, []);
 
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const rect = webglCanvasRef.current?.getBoundingClientRect();
+    if (rect && e.touches.length > 0) {
+      const touch = e.touches[0];
+      mouseRef.current.x = touch.clientX - rect.left;
+      mouseRef.current.y = touch.clientY - rect.top;
+    }
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const rect = webglCanvasRef.current?.getBoundingClientRect();
+    if (rect && e.touches.length > 0) {
+      const touch = e.touches[0];
+      mouseRef.current.x = touch.clientX - rect.left;
+      mouseRef.current.y = touch.clientY - rect.top;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    mouseRef.current.x = -9999;
+    mouseRef.current.y = -9999;
+  }, []);
+
   const handleClick = useCallback((e: React.MouseEvent) => {
     const mouse = mouseRef.current;
     
@@ -747,6 +776,9 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
         ref={webglCanvasRef}
         className="particle-canvas absolute inset-0 w-full h-full cursor-pointer"
         onMouseMove={handleMouseMove}
+        onTouchMove={handleTouchMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         onClick={handleClick}
       />
     </div>
