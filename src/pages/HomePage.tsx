@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { Rocket, ArrowUpRight, Globe, Code2, ShieldAlert, Sparkles, Star, Camera } from "lucide-react";
+import { Rocket, ArrowUpRight, Globe, Code2, ShieldAlert, Sparkles, Star, Camera, User } from "lucide-react";
 import { ShaderButton } from "../components/ui/shader-button";
 import { cn } from "@/lib/utils";
 import LandingPage from "../components/ui/landing-page";
@@ -116,13 +116,21 @@ export default function HomePage({ isMobile }: { isMobile: boolean }) {
               onClick={() => setIsUploadOpen(true)}
               title="Clique para anexar foto manualmente"
             >
-              <div className="w-full h-full rounded-full bg-black/95 flex flex-col items-center justify-center relative overflow-hidden text-center">
-                <img 
-                  src={avatarUrl} 
-                  alt="Rickzinxx" 
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-700 ease-out"
-                />
+              <div className="w-full h-full rounded-full bg-black/95 flex flex-col items-center justify-center relative catalog-avatar-box overflow-hidden text-center">
+                {avatarUrl ? (
+                  <img 
+                    src={avatarUrl} 
+                    alt="Rickzinxx" 
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-700 ease-out"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center rounded-full bg-zinc-950 border border-white/5 relative">
+                    <div className="absolute inset-0 rounded-full bg-primary/5 animate-pulse" />
+                    <User className="w-10 h-10 text-zinc-500 group-hover:text-primary transition-colors duration-300 relative z-10" />
+                    <span className="font-mono text-[8px] uppercase tracking-widest text-zinc-600 group-hover:text-primary/70 transition-colors duration-300 relative z-10 mt-1">Rickzinxx</span>
+                  </div>
+                )}
 
                 {/* Sleek Camera Overlay for Rickzinxx manual upload area */}
                 <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

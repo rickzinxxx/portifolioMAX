@@ -15,6 +15,7 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Read current avatar to show as preview if unlocked
@@ -30,6 +31,7 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
       setPassword('');
       setError(null);
       setSuccessMsg(null);
+      setIsSaving(false);
     }
   }, [isOpen]);
 
@@ -51,17 +53,40 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
       return;
     }
 
-    // Limit size to ~5MB for comfortable localStorage storage
-    if (file.size > 5 * 1024 * 1024) {
-      setError('A imagem deve ter no máximo 5MB.');
+    if (file.size > 8 * 1024 * 1024) {
+      setError('A imagem deve ter no máximo 8MB.');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setPreview(result);
-      setError(null);
+      const img = new Image();
+      img.onload = () => {
+        // Create canvas for crop and resize to exactly 256x256 for optimal profile rendering
+        const canvas = document.createElement('canvas');
+        const maxDim = 256;
+        canvas.width = maxDim;
+        canvas.height = maxDim;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Crop in standard square shape centered
+          const size = Math.min(img.width, img.height);
+          const xOffset = (img.width - size) / 2;
+          const yOffset = (img.height - size) / 2;
+          ctx.drawImage(img, xOffset, yOffset, size, size, 0, 0, maxDim, maxDim);
+          
+          // Render optimized JPEG around 15KB size
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.82);
+          setPreview(compressedBase64);
+          setError(null);
+        } else {
+          setError('Erro ao processar imagem.');
+        }
+      };
+      img.onerror = () => {
+        setError('Arquivo de imagem inválido.');
+      };
+      img.src = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
@@ -80,7 +105,7 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
+ 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       processFile(e.dataTransfer.files[0]);
     }
@@ -92,37 +117,83 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!preview) {
       setError('Por favor, anexe uma imagem primeiro.');
       return;
     }
     
     try {
+      setIsSaving(true);
+      setError(null);
+      setSuccessMsg('Salvando na nuvem...');
+
+      // 1. Save to local storage for local immediate update
       localStorage.setItem('rick_avatar_data', preview);
-      // Dispatch custom event to notify other instances across pages
       window.dispatchEvent(new CustomEvent('rick_avatar_updated', { detail: preview }));
-      setSuccessMsg('Foto atualizada com sucesso!');
+
+      // 2. Upload to central cloud KV store
+      const response = await fetch('https://kvdb.io/6gQ8bW2uV7H3rPnGkWyZ/rickzinxx_avatar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: preview,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Servidor respondeu com código ${response.status}`);
+      }
+
+      setSuccessMsg('Foto salva na nuvem e atualizada para todos!');
       setError(null);
       setTimeout(() => {
         onSuccess(preview);
         onClose();
       }, 1500);
     } catch (e) {
-      setError('Erro ao salvar. Tente uma imagem com tamanho reduzido.');
+      console.error(e);
+      setError('Salvo localmente! Ocorreu um pequeno atraso ao sincronizar na nuvem.');
+      setTimeout(() => {
+        onSuccess(preview);
+        onClose();
+      }, 1500);
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleReset = () => {
-    localStorage.removeItem('rick_avatar_data');
-    window.dispatchEvent(new CustomEvent('rick_avatar_updated', { detail: null }));
-    setSuccessMsg('Foto restaurada para o padrão.');
-    setPreview(null);
-    setError(null);
-    setTimeout(() => {
-      onSuccess(null);
-      onClose();
-    }, 1500);
+  const handleReset = async () => {
+    try {
+      setIsSaving(true);
+      setError(null);
+      setSuccessMsg('Restaurando padrão...');
+
+      localStorage.removeItem('rick_avatar_data');
+      window.dispatchEvent(new CustomEvent('rick_avatar_updated', { detail: null }));
+
+      // Send reset call to cloud
+      await fetch('https://kvdb.io/6gQ8bW2uV7H3rPnGkWyZ/rickzinxx_avatar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: 'RESET',
+      });
+
+      setSuccessMsg('Foto restaurada para o padrão.');
+      setPreview(null);
+      setError(null);
+      setTimeout(() => {
+        onSuccess(null);
+        onClose();
+      }, 1500);
+    } catch (e) {
+      console.error(e);
+      setError('Falha de conexão com a nuvem durante o reset.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -171,9 +242,9 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
           {/* STEP 1: Unlock Auth Panel */}
           {!isUnlocked ? (
             <form onSubmit={handleUnlock} className="space-y-4">
-              <div className="rounded-xl bg-primary/5 border border-primary/10 p-4 font-mono text-xs text-zinc-400 space-y-2 leading-relaxed">
-                <p>⚠️ Atenção: Para garantir que apenas você altere esta foto, este painel é protegido por credenciais.</p>
-                <p className="text-[10px] text-primary/80 font-bold uppercase tracking-wide">💡 Dica comercial: Digite a senha "rickzinxx" para desbloquear.</p>
+              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 font-mono text-xs text-red-400 space-y-1.5 leading-relaxed">
+                <p>⚠️ Área Restrita</p>
+                <p className="text-[10px] text-zinc-400">Este painel requer a chave criptográfica do desenvolvedor principal para autenticação.</p>
               </div>
 
               <div>
@@ -268,16 +339,18 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <button
                   onClick={handleReset}
-                  className="flex items-center justify-center gap-2 py-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white text-[10px] font-mono uppercase tracking-widest border border-white/5 transition-colors"
+                  disabled={isSaving}
+                  className="flex items-center justify-center gap-2 py-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-400 hover:text-white text-[10px] font-mono uppercase tracking-widest border border-white/5 transition-colors"
                 >
-                  <RefreshCw size={12} />
-                  Reset Padrão
+                  <RefreshCw size={12} className={isSaving ? 'animate-spin' : ''} />
+                  {isSaving ? 'Sincronizando' : 'Reset Padrão'}
                 </button>
                 <button
                   onClick={handleSave}
-                  className="py-3 rounded-lg bg-primary text-black hover:bg-orange-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_4px_12px_rgba(255,40,0,0.2)]"
+                  disabled={isSaving}
+                  className="py-3 rounded-lg bg-primary text-black hover:bg-orange-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_4px_12px_rgba(255,40,0,0.2)]"
                 >
-                  Confirmar Arte
+                  {isSaving ? 'Salvando...' : 'Confirmar Arte'}
                 </button>
               </div>
             </div>

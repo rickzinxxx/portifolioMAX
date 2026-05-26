@@ -335,9 +335,9 @@ export default function App() {
                      initial={{ opacity: 0, x: -20 }}
                      animate={{ opacity: 1, x: 0 }}
                      whileHover={{ scale: 1.02 }}
-                     className="text-base sm:text-lg md:text-3xl font-black italic tracking-tighter uppercase cursor-pointer flex items-center gap-1.5 md:gap-2 shrink-0"
+                     className="text-[12px] min-[360px]:text-sm sm:text-lg md:text-3xl font-black italic tracking-tighter uppercase cursor-pointer flex items-center gap-1 min-[360px]:gap-1.5 md:gap-2 shrink-0"
                    >
-                     <Code2 className="w-5 h-5 md:w-6 md:h-6 text-primary animate-pulse shrink-0" />
+                     <Code2 className="w-4 h-4 min-[360px]:w-5 min-[360px]:h-5 md:w-6 md:h-6 text-primary animate-pulse shrink-0" />
                      <div className="shrink-0">
                        <span className="text-white group-hover:text-primary transition-colors duration-500">{t("nav.brand")}</span>
                        <span className="text-primary italic group-hover:text-white transition-colors duration-500">{t("nav.brandSuffix")}</span>
