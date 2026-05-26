@@ -232,6 +232,7 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
   const webglCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const particlesRef = useRef<Particle[]>([]);
+  const actualFontSizeRef = useRef<number>(75);
   const mouseRef = useRef({ x: 0, y: 0, isDown: false });
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const programRef = useRef<WebGLProgram | null>(null);
@@ -368,14 +369,28 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
 
     particlesRef.current = [];
 
-    // Responsive font size: larger and more prominent on mobile
+    // Responsive font size: larger and more prominent on mobile but self-adjusting to fit without overflow
     const isMobileDevice = window.innerWidth < 768;
-    const calculatedFontSize = fontSize || (isMobileDevice ? Math.max(55, Math.min(85, window.innerWidth / 5.5)) : Math.min(100, window.innerWidth / 8));
+    let computedFontSize = fontSize || (isMobileDevice ? Math.max(50, Math.min(80, window.innerWidth / 5.2)) : Math.min(100, window.innerWidth / 8));
+    
+    // Fit check: Prevent name overflow or screen-clipping on all mobile viewports
+    const maxAllowedWidth = window.innerWidth * 0.82; // Safe internal content bound
+    ctx.font = `italic 900 ${computedFontSize}px ${fontFamily}`;
+    let textWidth = ctx.measureText(text).width;
+    
+    // Adapt down dynamically if name is too long for the mobile viewport
+    while (textWidth > maxAllowedWidth && computedFontSize > 18) {
+      computedFontSize -= 2;
+      ctx.font = `italic 900 ${computedFontSize}px ${fontFamily}`;
+      textWidth = ctx.measureText(text).width;
+    }
+    
+    actualFontSizeRef.current = computedFontSize;
+    const calculatedFontSize = computedFontSize;
     ctx.font = `italic 900 ${calculatedFontSize}px ${fontFamily}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const textWidth = ctx.measureText(text).width;
     const startX = canvas.width / 2;
     const startY = canvas.height / 2;
 
@@ -529,8 +544,7 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     const opacities = new Float32Array(particles.length);
 
     const isMobileDevice = window.innerWidth < 768;
-    const calculatedFontSize = fontSize || (isMobileDevice ? Math.max(55, Math.min(85, window.innerWidth / 5.5)) : Math.min(100, window.innerWidth / 8));
-    const sizeScaleFactor = calculatedFontSize / 100;
+    const sizeScaleFactor = actualFontSizeRef.current / 100;
 
     for (let i = 0; i < particles.length; i++) {
       positions[i * 2] = particles[i].x;
