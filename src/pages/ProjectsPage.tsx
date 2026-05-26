@@ -90,13 +90,6 @@ export default function ProjectsPage() {
                  <CardParagraph className={idx === 0 ? 'text-black/80' : 'text-zinc-200 font-medium'}>
                    {project.desc}
                  </CardParagraph>
-                 <div className={cn(
-                   "mt-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
-                   idx === 0 ? "text-black/40" : "text-primary"
-                 )}>
-                   <ExternalLink size={12} />
-                   Acessar Projeto
-                 </div>
               </PricingWrapper>
             ))}
         </div>

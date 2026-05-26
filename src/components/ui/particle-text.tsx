@@ -369,38 +369,52 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
 
     particlesRef.current = [];
 
-    // Responsive font size: larger and more prominent on mobile but self-adjusting to fit without overflow
     const isMobileDevice = window.innerWidth < 768;
-    let computedFontSize = fontSize || (isMobileDevice ? Math.max(50, Math.min(80, window.innerWidth / 5.2)) : Math.min(100, window.innerWidth / 8));
+    const dpr = window.devicePixelRatio || 1;
+
+    // Calculate the ideal CSS font size first
+    let cssFontSize = fontSize || (isMobileDevice ? Math.max(34, Math.min(52, window.innerWidth / 7.5)) : Math.min(100, window.innerWidth / 8));
     
-    // Fit check: Prevent name overflow or screen-clipping on all mobile viewports
-    const maxAllowedWidth = window.innerWidth * 0.82; // Safe internal content bound
-    ctx.font = `italic 900 ${computedFontSize}px ${fontFamily}`;
-    let textWidth = ctx.measureText(text).width;
-    
-    // Adapt down dynamically if name is too long for the mobile viewport
-    while (textWidth > maxAllowedWidth && computedFontSize > 18) {
-      computedFontSize -= 2;
-      ctx.font = `italic 900 ${computedFontSize}px ${fontFamily}`;
-      textWidth = ctx.measureText(text).width;
+    // Use a temporary context in CSS-scale size to measure and fit text
+    const testCanvas = document.createElement('canvas');
+    const testCtx = testCanvas.getContext('2d');
+    let textWidth = 0;
+    if (testCtx) {
+      testCtx.font = `italic 900 ${cssFontSize}px ${fontFamily}`;
+      const maxAllowedCSSWidth = window.innerWidth * 0.85;
+      let textCSSWidth = testCtx.measureText(text).width;
+      
+      while (textCSSWidth > maxAllowedCSSWidth && cssFontSize > 18) {
+        cssFontSize -= 2;
+        testCtx.font = `italic 900 ${cssFontSize}px ${fontFamily}`;
+        textCSSWidth = testCtx.measureText(text).width;
+      }
+      textWidth = textCSSWidth;
+    } else {
+      textWidth = cssFontSize * text.length * 0.6;
     }
-    
-    actualFontSizeRef.current = computedFontSize;
-    const calculatedFontSize = computedFontSize;
-    ctx.font = `italic 900 ${calculatedFontSize}px ${fontFamily}`;
+
+    // Now convert the calculated CSS font size into our real high-DPI canvas font size
+    const finalCanvasFontSize = cssFontSize * dpr;
+    actualFontSizeRef.current = cssFontSize; // Save the base size for scaling references
+
+    ctx.font = `italic 900 ${finalCanvasFontSize}px ${fontFamily}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    
+    // Re-measure with genuine context
+    const textCanvasWidth = ctx.measureText(text).width;
 
     const startX = canvas.width / 2;
     const startY = canvas.height / 2;
 
-    // Create temporary canvas for text pixel analysis
+    // Create temporary canvas for text pixel analysis at physical DPI
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     if (!tempCtx) return;
 
-    tempCanvas.width = textWidth + 100;
-    tempCanvas.height = calculatedFontSize + 50;
+    tempCanvas.width = textCanvasWidth + 100 * dpr;
+    tempCanvas.height = finalCanvasFontSize + 50 * dpr;
 
     tempCtx.font = ctx.font;
     tempCtx.fillStyle = '#FFFFFF';
@@ -412,8 +426,8 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
     const data = imageData.data;
 
-    // Use step = 4 on mobile to prevent dense over-crowding, 2 on desktop
-    const step = isMobileDevice ? 4 : 2;
+    // Use step = 4 * dpr on mobile to prevent dense over-crowding, 2 * dpr on desktop
+    const step = Math.max(1, Math.round((isMobileDevice ? 4 : 2) * dpr));
     for (let y = 0; y < tempCanvas.height; y += step) {
       for (let x = 0; x < tempCanvas.width; x += step) {
         const index = (y * tempCanvas.width + x) * 4;
@@ -424,8 +438,8 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
           const particleY = startY + y - tempCanvas.height / 2;
           
           particlesRef.current.push({
-            x: particleX + (Math.random() - 0.5) * (isMobileDevice ? 30 : 80),
-            y: particleY + (Math.random() - 0.5) * (isMobileDevice ? 30 : 80),
+            x: particleX + (Math.random() - 0.5) * (isMobileDevice ? 20 * dpr : 60 * dpr),
+            y: particleY + (Math.random() - 0.5) * (isMobileDevice ? 20 * dpr : 60 * dpr),
             targetX: particleX,
             targetY: particleY,
             originalX: particleX,
@@ -445,6 +459,7 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
 
   const updateParticle = useCallback((particle: Particle) => {
     const mouse = mouseRef.current;
+    const dpr = window.devicePixelRatio || 1;
     
     if (particle.isExplosion) {
       particle.x += particle.vx;
@@ -460,21 +475,23 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     const dx = mouse.x - particle.x;
     const dy = mouse.y - particle.y;
     const distanceSquared = dx * dx + dy * dy;
-    const mouseForceSquared = mouseForce * mouseForce;
+    
+    const mouseForceScaled = mouseForce * dpr;
+    const mouseForceSquared = mouseForceScaled * mouseForceScaled;
 
     if (distanceSquared < mouseForceSquared) {
       const distance = Math.sqrt(distanceSquared);
-      const force = (mouseForce - distance) / mouseForce;
+      const force = (mouseForceScaled - distance) / mouseForceScaled;
       const angle = Math.atan2(dy, dx);
       const forceMultiplier = interactionMode === 'attract' ? 1 : -1;
       
-      particle.vx += Math.cos(angle) * force * 3 * forceMultiplier;
-      particle.vy += Math.sin(angle) * force * 3 * forceMultiplier;
+      particle.vx += Math.cos(angle) * force * 3 * dpr * forceMultiplier;
+      particle.vy += Math.sin(angle) * force * 3 * dpr * forceMultiplier;
     }
 
     // Return to target position
-    const returnForceX = (particle.targetX - particle.x) * 0.04 * animationSpeed;
-    const returnForceY = (particle.targetY - particle.y) * 0.04 * animationSpeed;
+    const returnForceX = (particle.targetX - particle.x) * 0.04 * animationSpeed * dpr;
+    const returnForceY = (particle.targetY - particle.y) * 0.04 * animationSpeed * dpr;
 
     particle.vx += returnForceX;
     particle.vy += returnForceY;
@@ -659,12 +676,14 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
 
     const parentNode = webglCanvas.parentElement;
     const w = parentNode ? parentNode.clientWidth : window.innerWidth;
-    const h = parentNode ? parentNode.clientHeight : 400;
+    const h = parentNode ? parentNode.clientHeight : 220;
 
-    canvas.width = w;
-    canvas.height = h;
-    webglCanvas.width = w;
-    webglCanvas.height = h;
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    webglCanvas.width = w * dpr;
+    webglCanvas.height = h * dpr;
     
     // Update WebGL viewport and framebuffer
     const gl = glRef.current;
@@ -682,26 +701,29 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const rect = webglCanvasRef.current?.getBoundingClientRect();
     if (rect) {
-      mouseRef.current.x = e.clientX - rect.left;
-      mouseRef.current.y = e.clientY - rect.top;
+      const dpr = window.devicePixelRatio || 1;
+      mouseRef.current.x = (e.clientX - rect.left) * dpr;
+      mouseRef.current.y = (e.clientY - rect.top) * dpr;
     }
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const rect = webglCanvasRef.current?.getBoundingClientRect();
     if (rect && e.touches.length > 0) {
+      const dpr = window.devicePixelRatio || 1;
       const touch = e.touches[0];
-      mouseRef.current.x = touch.clientX - rect.left;
-      mouseRef.current.y = touch.clientY - rect.top;
+      mouseRef.current.x = (touch.clientX - rect.left) * dpr;
+      mouseRef.current.y = (touch.clientY - rect.top) * dpr;
     }
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const rect = webglCanvasRef.current?.getBoundingClientRect();
     if (rect && e.touches.length > 0) {
+      const dpr = window.devicePixelRatio || 1;
       const touch = e.touches[0];
-      mouseRef.current.x = touch.clientX - rect.left;
-      mouseRef.current.y = touch.clientY - rect.top;
+      mouseRef.current.x = (touch.clientX - rect.left) * dpr;
+      mouseRef.current.y = (touch.clientY - rect.top) * dpr;
     }
   }, []);
 
@@ -712,12 +734,14 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     const mouse = mouseRef.current;
+    if (mouse.x === -9999) return;
+    const dpr = window.devicePixelRatio || 1;
     
     // Create explosion effect
     const explosionParticles = 60;
     for (let i = 0; i < explosionParticles; i++) {
       const angle = (Math.PI * 2 * i) / explosionParticles;
-      const velocity = 2 + Math.random() * 20;
+      const velocity = (2 + Math.random() * 20) * dpr;
       
       particlesRef.current.push({
         x: mouse.x,
@@ -736,6 +760,7 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     }
 
     // Affect nearby particles
+    const explosionRadius = 120 * dpr;
     particlesRef.current.forEach(particle => {
       if (particle.isExplosion) return;
       
@@ -743,11 +768,11 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
       const dy = particle.y - mouse.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < 120) {
-        const force = (120 - distance) / 120;
+      if (distance < explosionRadius) {
+        const force = (explosionRadius - distance) / explosionRadius;
         const angle = Math.atan2(dy, dx);
-        particle.vx += Math.cos(angle) * force * 30;
-        particle.vy += Math.sin(angle) * force * 30;
+        particle.vx += Math.cos(angle) * force * 30 * dpr;
+        particle.vy += Math.sin(angle) * force * 30 * dpr;
       }
     });
   }, [particleSize]);

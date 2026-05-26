@@ -355,7 +355,7 @@ export default function App() {
                    {[
                      { name: t("nav.inicio"), path: "/" },
                      { name: t("nav.projetos"), path: "/projects" },
-                     { name: t("nav.global"), path: "/global" },
+                     
                      { name: t("nav.sobre"), path: "/about" },
                      { name: t("nav.experiencia"), path: "/experience" },
                      { name: t("nav.contato"), path: "/contact" }
@@ -411,7 +411,6 @@ export default function App() {
                     {[
                       { name: t("nav.inicio"), path: "/" },
                       { name: t("nav.projetos"), path: "/projects" },
-                      { name: t("nav.global"), path: "/global" },
                       { name: t("nav.sobre"), path: "/about" },
                       { name: t("nav.experiencia"), path: "/experience" },
                       { name: t("nav.contato"), path: "/contact" }
@@ -442,7 +441,7 @@ export default function App() {
             <Routes location={location} key={location.pathname}>
                <Route path="/" element={<HomePage isMobile={isMobile} />} />
                <Route path="/projects" element={<ProjectsPage />} />
-               <Route path="/global" element={<DashboardPage />} />
+
                <Route path="/about" element={<AboutPage />} />
                <Route path="/experience" element={<ExperiencePage />} />
                <Route path="/contact" element={<ContactPage />} />

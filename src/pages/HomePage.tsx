@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { Rocket, ArrowUpRight, Globe, Code2, ShieldAlert, Sparkles, Star } from "lucide-react";
+import { Rocket, ArrowUpRight, Globe, Code2, ShieldAlert, Sparkles, Star, Camera } from "lucide-react";
 import { ShaderButton } from "../components/ui/shader-button";
 import { cn } from "@/lib/utils";
 import LandingPage from "../components/ui/landing-page";
 import { Link } from "react-router-dom";
 import { ParticleText } from "../components/ui/particle-text";
+import { useAvatar } from "../lib/useAvatar";
+import AvatarUploadModal from "../components/ui/AvatarUploadModal";
 
 const STACK = [
   "React", "HTML5", "CSS3", "JavaScript", "Next.js", "Three.js", "GSAP", 
@@ -15,6 +17,8 @@ const STACK = [
 
 export default function HomePage({ isMobile }: { isMobile: boolean }) {
   const { t } = useTranslation();
+  const { avatarUrl } = useAvatar();
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [statProjects, setStatProjects] = useState(0);
   const [statClients, setStatClients] = useState(0);
@@ -102,6 +106,33 @@ export default function HomePage({ isMobile }: { isMobile: boolean }) {
       {/* Hero Section */}
       <section className="w-full max-w-2xl">
         <div className="text-center mb-10">
+          {/* Circular Photo Avatar */}
+          <div className="flex justify-center mb-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="relative w-32 h-32 md:w-36 md:h-36 rounded-full p-1 bg-gradient-to-tr from-primary to-orange-500 shadow-[0_0_40px_rgba(255,40,0,0.25)] group overflow-hidden cursor-pointer"
+              onClick={() => setIsUploadOpen(true)}
+              title="Clique para anexar foto manualmente"
+            >
+              <div className="w-full h-full rounded-full bg-black/95 flex flex-col items-center justify-center relative overflow-hidden text-center">
+                <img 
+                  src={avatarUrl} 
+                  alt="Rickzinxx" 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-700 ease-out"
+                />
+
+                {/* Sleek Camera Overlay for Rickzinxx manual upload area */}
+                <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Camera className="w-6 h-6 text-primary animate-pulse" />
+                  <span className="font-mono text-[8px] uppercase tracking-widest text-zinc-300 font-bold">Alterar Foto</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
           {/* Accent Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/25 mb-6 font-mono text-[10px] font-black uppercase tracking-widest text-primary">
             <Sparkles size={10} className="animate-spin" />
@@ -292,6 +323,12 @@ export default function HomePage({ isMobile }: { isMobile: boolean }) {
       <section className="w-full mt-20 relative">
         <LandingPage />
       </section>
+
+      <AvatarUploadModal 
+        isOpen={isUploadOpen} 
+        onClose={() => setIsUploadOpen(false)} 
+        onSuccess={() => {}} 
+      />
     </div>
   );
 }

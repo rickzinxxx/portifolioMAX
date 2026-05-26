@@ -2,5 +2,5 @@
   "name": "Marcos Henrique - Hardened Portfolio",
   "description": "Portfolio de engenharia de software — interfaces performáticas, motion e arquitetura de sistemas. [HARDENED & SECURE VERSION - ANTI-CLONE ACTIVE]",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
