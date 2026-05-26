@@ -328,17 +328,17 @@ export default function App() {
           >
             {/* Nav Header (Common for all pages) */}
             <div className="w-full max-w-4xl mx-auto px-6 pt-12 flex flex-col items-center">
-              <div className="w-full flex items-center justify-between mb-8 gap-6 relative">
+              <div className="w-full flex items-center justify-between mb-8 gap-2 sm:gap-4 md:gap-6 relative">
                  {/* Brand Logo */}
-                 <Link to="/" className="group flex flex-col items-start">
+                 <Link to="/" className="group flex flex-col items-start shrink-0">
                    <motion.div 
                      initial={{ opacity: 0, x: -20 }}
                      animate={{ opacity: 1, x: 0 }}
                      whileHover={{ scale: 1.02 }}
-                     className="text-2xl md:text-3xl font-black italic tracking-tighter uppercase cursor-pointer flex items-center gap-2"
+                     className="text-base sm:text-lg md:text-3xl font-black italic tracking-tighter uppercase cursor-pointer flex items-center gap-1.5 md:gap-2 shrink-0"
                    >
-                     <Code2 className="w-6 h-6 text-primary animate-pulse" />
-                     <div>
+                     <Code2 className="w-5 h-5 md:w-6 md:h-6 text-primary animate-pulse shrink-0" />
+                     <div className="shrink-0">
                        <span className="text-white group-hover:text-primary transition-colors duration-500">{t("nav.brand")}</span>
                        <span className="text-primary italic group-hover:text-white transition-colors duration-500">{t("nav.brandSuffix")}</span>
                      </div>
@@ -346,7 +346,7 @@ export default function App() {
                    <motion.div 
                      animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.01, 1] }}
                      transition={{ duration: 2, repeat: Infinity }}
-                     className="h-1 w-full bg-primary/80 blur-[2px] mt-[-2px]" 
+                     className="h-[2px] w-full bg-primary/80 blur-[1px] mt-[-2px]" 
                    />
                  </Link>
 

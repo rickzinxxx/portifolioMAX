@@ -245,6 +245,18 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
     opacity: WebGLBuffer | null;
   }>({ position: null, size: null, opacity: null });
   
+  const [webglFailed, setWebglFailed] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+
+  useEffect(() => {
+    setIsMobileDevice(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobileDevice(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [, setPerformance] = useState({
     fps: 60,
     particleCount: 0
@@ -785,22 +797,38 @@ export const ParticleText: React.FC<ParticleTextProps> = ({
       return () => {
         window.removeEventListener('resize', handleCanvasResize);
       };
+    } else {
+      setWebglFailed(true);
     }
   }, [initWebGL, handleCanvasResize]);
 
   useEffect(() => {
-    createParticlesFromText();
-  }, [createParticlesFromText]);
+    if (!isMobileDevice && !webglFailed) {
+      createParticlesFromText();
+    }
+  }, [createParticlesFromText, isMobileDevice, webglFailed]);
 
   useEffect(() => {
-    animationRef.current = requestAnimationFrame(animate);
+    if (!isMobileDevice && !webglFailed) {
+      animationRef.current = requestAnimationFrame(animate);
+    }
     
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [animate]);
+  }, [animate, isMobileDevice, webglFailed]);
+
+  if (isMobileDevice || webglFailed) {
+    return (
+      <div className={`flex items-center justify-center w-full min-h-[50px] md:min-h-[80px] py-1 select-none ${className}`}>
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-sans font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-500 to-primary drop-shadow-[0_0_15px_rgba(255,40,0,0.25)]">
+          {text}
+        </h1>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative w-full h-[150px] md:h-[220px] overflow-hidden ${className}`}>
