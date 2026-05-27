@@ -50,6 +50,7 @@ import { ShaderButton } from "./components/ui/shader-button";
 import { CTASection } from "./components/ui/hero-dithering-card";
 import { AreaChart, Area, Grid, XAxis, YAxis, ChartTooltip } from "./components/ui/area-chart";
 import { OfflinePage } from "./components/ui/offline-page";
+import { ParallaxHero } from "./components/ui/wilderness";
 
 import { Routes, Route, useLocation, Link } from "react-router-dom";
 import HomePage from "./pages/HomePage";
@@ -284,8 +285,11 @@ export default function App() {
     <div className="min-h-screen text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden cursor-default relative bg-black">
       <SecurityShield />
       
+      {/* 3D Depth Wilderness Parallax Background */}
+      <ParallaxHero className="fixed inset-0 z-0 opacity-60 select-none pointer-events-none" />
+      
       {/* Background Effect - Always Visible */}
-      <div className="fixed inset-0 z-0 bg-black pointer-events-none overflow-hidden touch-none">
+      <div className="fixed inset-0 z-0 bg-black/40 pointer-events-none overflow-hidden touch-none">
         <div className="absolute top-0 -left-1/4 w-1/2 h-1/2 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 -right-1/4 w-1/2 h-1/2 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
         <BackgroundShaders isMobile={isMobile} />
