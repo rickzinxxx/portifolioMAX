@@ -74,19 +74,19 @@ export default function HomePage({ isMobile }: { isMobile: boolean }) {
 
     let step = 0;
     const projectIncrement = 50 / steps;
-    const clientIncrement = 1000 / steps;
-    const expIncrement = 5 / steps;
+    const clientIncrement = 80 / steps;
+    const expIncrement = 4 / steps;
 
     const timer = setInterval(() => {
       step++;
       setStatProjects(prev => (prev < 50 ? Math.min(50, Math.ceil(prev + projectIncrement)) : 50));
-      setStatClients(prev => (prev < 1000 ? Math.min(1000, Math.ceil(prev + clientIncrement)) : 1000));
-      setStatExperience(prev => (prev < 5 ? Math.min(5, Math.ceil(prev + expIncrement)) : 5));
+      setStatClients(prev => (prev < 80 ? Math.min(80, Math.ceil(prev + clientIncrement)) : 80));
+      setStatExperience(prev => (prev < 4 ? Math.min(4, Math.ceil(prev + expIncrement)) : 4));
 
       if (step >= steps) {
         setStatProjects(50);
-        setStatClients(1000);
-        setStatExperience(5);
+        setStatClients(80);
+        setStatExperience(4);
         clearInterval(timer);
       }
     }, intervalTime);

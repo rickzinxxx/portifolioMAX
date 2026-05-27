@@ -11,7 +11,7 @@ const resources = {
           "Seja bem vindo ao portfólio do rickzinxx",
           "E da nossa empresa Techify",
           "Fizemos o design à mão",
-          "Temos 5 anos de mercado",
+          "Temos 4 anos de mercado",
           "O melhor site que você já viu"
         ]
       },
@@ -55,7 +55,7 @@ const resources = {
           "Welcome to rickzinxx's portfolio",
           "And to our company, Techify",
           "We crafted the design by hand",
-          "5 years of experience",
+          "4 years of experience",
           "The best site you've ever seen"
         ]
       },
