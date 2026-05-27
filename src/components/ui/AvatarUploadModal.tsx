@@ -21,7 +21,7 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
   // Read current avatar to show as preview if unlocked
   useEffect(() => {
     if (isOpen) {
-      const saved = localStorage.getItem('rick_avatar_data');
+      const saved = localStorage.getItem('rick_avatar_shared_data');
       if (saved) {
         setPreview(saved);
       } else {
@@ -129,11 +129,11 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
       setSuccessMsg('Salvando na nuvem...');
 
       // 1. Save to local storage for local immediate update
-      localStorage.setItem('rick_avatar_data', preview);
+      localStorage.setItem('rick_avatar_shared_data', preview);
       window.dispatchEvent(new CustomEvent('rick_avatar_updated', { detail: preview }));
 
       // 2. Upload to central cloud KV store
-      const response = await fetch('https://kvdb.io/6gQ8bW2uV7H3rPnGkWyZ/rickzinxx_avatar', {
+      const response = await fetch('/api/avatar', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain',
@@ -153,7 +153,7 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
       }, 1500);
     } catch (e) {
       console.error(e);
-      setError('Salvo localmente! Ocorreu um pequeno atraso ao sincronizar na nuvem.');
+      setError('Erro ao sincronizar imagem no servidor.');
       setTimeout(() => {
         onSuccess(preview);
         onClose();
@@ -169,11 +169,11 @@ export default function AvatarUploadModal({ isOpen, onClose, onSuccess }: Avatar
       setError(null);
       setSuccessMsg('Restaurando padrão...');
 
-      localStorage.removeItem('rick_avatar_data');
+      localStorage.removeItem('rick_avatar_shared_data');
       window.dispatchEvent(new CustomEvent('rick_avatar_updated', { detail: null }));
 
       // Send reset call to cloud
-      await fetch('https://kvdb.io/6gQ8bW2uV7H3rPnGkWyZ/rickzinxx_avatar', {
+      await fetch('/api/avatar', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain',

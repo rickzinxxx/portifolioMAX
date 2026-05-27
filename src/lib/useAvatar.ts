@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 export function useAvatar() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(() => {
-    const saved = localStorage.getItem('rick_avatar_data');
+    const saved = localStorage.getItem('rick_avatar_shared_data');
     return saved || null;
   });
 
@@ -10,14 +10,15 @@ export function useAvatar() {
     // Centralized async cloud avatar fetching
     const fetchCloudAvatar = async () => {
       try {
-        const response = await fetch('https://kvdb.io/6gQ8bW2uV7H3rPnGkWyZ/rickzinxx_avatar');
+        const response = await fetch('/api/avatar');
         if (response.ok) {
-          const cloudValue = await response.text();
+          const data = await response.json();
+          const cloudValue = data?.avatar;
           if (cloudValue && cloudValue !== 'RESET' && cloudValue.startsWith('data:image/')) {
-            localStorage.setItem('rick_avatar_data', cloudValue);
+            localStorage.setItem('rick_avatar_shared_data', cloudValue);
             setAvatarUrl(cloudValue);
-          } else if (cloudValue === 'RESET') {
-            localStorage.removeItem('rick_avatar_data');
+          } else {
+            localStorage.removeItem('rick_avatar_shared_data');
             setAvatarUrl(null);
           }
         }
