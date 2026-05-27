@@ -18,7 +18,7 @@ const TIMELINE = [
   {
     date: "2022 - 2023",
     role: "Estagiário em Desenvolvimento Web",
-    company: "Empresa XYZ",
+    company: "Netmake",
     desc: "Suporte e melhoria contínua de aplicações corporativas internas baseadas em ecossistema JS moderno.",
     points: [
       "Implementação de novos componentes React reaproveitáveis documentados no Storybook",
@@ -30,7 +30,7 @@ const TIMELINE = [
   {
     date: "2021 - 2022",
     role: "Desenvolvedor Júnior",
-    company: "Agência Digital ABC",
+    company: "Avanthia",
     desc: "Desenvolvimento rápido de sites institucionais, e-commerces completos e blogs de conteúdo para marcas regionais.",
     points: [
       "Desenvolvimento dinâmico com ecossistemas CMS flexíveis e frameworks correlacionados",
